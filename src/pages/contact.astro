@@ -1,0 +1,159 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../consts.js';
+---
+
+<BaseLayout
+  title="Contact Pet-GoToPro"
+  description="Get in touch with the Pet-GoToPro editorial team — for product suggestions, content corrections, partnership inquiries, or just to say hello."
+>
+  <section class="category-hero">
+    <div class="container-narrow">
+      <div class="breadcrumbs">
+        <a href="/">Home</a> › <span aria-current="page">Contact</span>
+      </div>
+      <h1>Contact Us</h1>
+      <p class="hero-lede">
+        Have a product suggestion, found an error, or want to partner with us? We read every message.
+      </p>
+    </div>
+  </section>
+
+  <div class="page-content">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start;" class="contact-grid-wrap">
+      <!-- Contact info -->
+      <div>
+        <h2 style="margin-top: 0;">How to reach us</h2>
+        <p>
+          The fastest way to get in touch is email. We try to respond to all inquiries within two business days, though complex editorial questions sometimes take longer because we want to give thoughtful answers rather than quick ones.
+        </p>
+
+        <div style="background: var(--bg-alt); border-radius: var(--radius-lg); padding: 1.5rem; margin: 2rem 0;">
+          <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem;">
+            Email
+          </div>
+          <a href={`mailto:${SITE.email}`} style="font-size: 1.2rem; font-weight: 600;">
+            {SITE.email}
+          </a>
+        </div>
+
+        <h3>What to email us about</h3>
+        <p>
+          <strong>Product suggestions.</strong> If there's a product you think we should test and review, let us know what it is and what niche it fills. We pay attention to reader requests when planning editorial calendars.
+        </p>
+        <p>
+          <strong>Corrections.</strong> If you spot a factual error, an outdated price, a broken link, or a product that's changed since our review, please flag it. We care about accuracy more than being right the first time.
+        </p>
+        <p>
+          <strong>Partnership inquiries.</strong> We're selective about partnerships and do not accept payment in exchange for positive coverage or pre-approved reviews. If you represent a brand and want to discuss sending a product for independent evaluation, our rules are documented in our <a href="/editorial-policy/">editorial policy</a>.
+        </p>
+        <p>
+          <strong>Press and media.</strong> For press inquiries, interview requests, or permission to quote from our articles, email us with the subject line "Press inquiry" and we'll route it to the right person.
+        </p>
+      </div>
+
+      <!-- Contact form -->
+      <div>
+        <h2 style="margin-top: 0;">Send a message</h2>
+
+        <!--
+          ============================================================
+          CONTACT FORM SETUP
+          ============================================================
+          This form uses Web3Forms, a free service that accepts form
+          submissions and emails them to you. No account needed.
+
+          To activate:
+          1. Go to https://web3forms.com
+          2. Enter your contact@pet-gotopro.com email
+          3. Click "Create Access Key"
+          4. Copy the key
+          5. Paste it below, replacing YOUR_ACCESS_KEY_HERE
+          6. Save and rebuild.
+
+          That's it. Submissions will arrive in your inbox. Free tier:
+          250 submissions per month — plenty for most new sites.
+          ============================================================
+        -->
+        <form
+          action="https://api.web3forms.com/submit"
+          method="POST"
+          style="background: white; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 2rem; box-shadow: var(--shadow-sm);"
+        >
+          <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE" />
+          <input type="hidden" name="subject" value="New Pet-GoToPro contact form submission" />
+          <input type="hidden" name="from_name" value="Pet-GoToPro contact form" />
+
+          <!-- Honeypot to stop spam bots -->
+          <input type="checkbox" name="botcheck" style="display:none;" tabindex="-1" autocomplete="off" />
+
+          <div style="margin-bottom: 1rem;">
+            <label for="name" style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.5rem;">Name</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              required
+              style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius); font-family: inherit; font-size: 1rem;"
+            />
+          </div>
+
+          <div style="margin-bottom: 1rem;">
+            <label for="email" style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.5rem;">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              required
+              style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius); font-family: inherit; font-size: 1rem;"
+            />
+          </div>
+
+          <div style="margin-bottom: 1rem;">
+            <label for="topic" style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.5rem;">Topic</label>
+            <select
+              id="topic"
+              name="topic"
+              required
+              style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius); font-family: inherit; font-size: 1rem; background: white;"
+            >
+              <option value="">Please choose...</option>
+              <option value="product-suggestion">Product suggestion</option>
+              <option value="correction">Correction or error report</option>
+              <option value="partnership">Partnership inquiry</option>
+              <option value="press">Press or media</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div style="margin-bottom: 1.5rem;">
+            <label for="message" style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.5rem;">Message</label>
+            <textarea
+              id="message"
+              name="message"
+              required
+              rows="6"
+              style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius); font-family: inherit; font-size: 1rem; resize: vertical;"
+            ></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%;">
+            Send message
+          </button>
+
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 1rem; margin-bottom: 0; line-height: 1.5;">
+            By submitting this form you agree to our <a href="/privacy/">privacy policy</a>. We'll only use your email to respond to you, never for marketing without explicit consent.
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    @media (max-width: 768px) {
+      .contact-grid-wrap {
+        grid-template-columns: 1fr !important;
+      }
+    }
+  </style>
+</BaseLayout>

@@ -1,0 +1,225 @@
+---
+// ============================================================
+// AUTHOR PROFILE PAGE — /authors/[slug]/
+// ============================================================
+// This template renders a dedicated page for each author on
+// the site. Author pages are a critical part of the E-E-A-T
+// signals Google looks for — they show that real people with
+// real credentials are behind the content, which is one of
+// the strongest differentiators between legitimate publishers
+// and content farms in Google's evaluation process.
+//
+// Every author page is linked from the byline of every post
+// that author wrote, and the page lists all of that author's
+// contributions in reverse chronological order.
+// ============================================================
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { SITE, PET_CATEGORIES } from '../../consts.js';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const authors = await getCollection('authors');
+  return authors.map((author) => ({
+    params: { slug: author.slug },
+    props: { author },
+  }));
+}
+
+const { author } = Astro.props;
+const { Content } = await author.render();
+
+// Find all articles by this author across all content types
+const allReviews = await getCollection('reviews', ({ data }) => !data.draft);
+const allGuides = await getCollection('guides', ({ data }) => !data.draft);
+const allNews = await getCollection('news', ({ data }) => !data.draft);
+
+const reviewsByAuthor = allReviews.filter((p) => p.data.author === author.slug);
+const guidesByAuthor = allGuides.filter((p) => p.data.author === author.slug);
+const newsByAuthor = allNews.filter((p) => p.data.author === author.slug);
+
+const totalPosts = reviewsByAuthor.length + guidesByAuthor.length + newsByAuthor.length;
+
+// Build schema.org Person object for E-E-A-T signals
+const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: author.data.name,
+  jobTitle: author.data.role,
+  description: author.data.shortBio,
+  image: new URL(
+    typeof author.data.photo === 'string' ? author.data.photo : author.data.photo.src,
+    Astro.site
+  ).toString(),
+  url: new URL(Astro.url.pathname, Astro.site).toString(),
+};
+
+if (author.data.credentials && author.data.credentials.length > 0) {
+  personSchema.hasCredential = author.data.credentials;
+}
+
+if (author.data.links) {
+  const sameAs = [];
+  if (author.data.links.linkedin) sameAs.push(author.data.links.linkedin);
+  if (author.data.links.website) sameAs.push(author.data.links.website);
+  if (author.data.links.twitter) sameAs.push(author.data.links.twitter);
+  if (sameAs.length > 0) personSchema.sameAs = sameAs;
+}
+---
+
+<BaseLayout
+  title={`${author.data.name} - ${author.data.role}`}
+  description={author.data.shortBio}
+  image={typeof author.data.photo === 'string' ? author.data.photo : author.data.photo.src}
+>
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(personSchema)} />
+
+  <!-- Profile header -->
+  <section style="background: linear-gradient(180deg, var(--primary-light), var(--bg)); padding: 3rem 1rem 2rem;">
+    <div class="container-narrow">
+      <div class="breadcrumbs">
+        <a href="/">Home</a> › <span aria-current="page">{author.data.name}</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 180px 1fr; gap: 2rem; align-items: start;" class="author-header">
+        <img
+          src={typeof author.data.photo === 'string' ? author.data.photo : author.data.photo.src}
+          alt={author.data.name}
+          style="width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: var(--radius-lg); border: 4px solid white; box-shadow: var(--shadow);"
+        />
+
+        <div>
+          <div style="font-size: 0.85rem; color: var(--primary); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.5rem;">
+            {author.data.role}
+          </div>
+          <h1 style="margin-bottom: 1rem;">{author.data.name}</h1>
+
+          {author.data.credentials && author.data.credentials.length > 0 && (
+            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
+              {author.data.credentials.map((cred) => (
+                <span style="background: white; border: 1px solid var(--border); padding: 0.35rem 0.75rem; border-radius: var(--radius-full); font-size: 0.85rem; font-weight: 500;">
+                  {cred}
+                </span>
+              ))}
+            </div>
+          )}
+
+          <p style="font-size: 1.1rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1rem;">
+            {author.data.shortBio}
+          </p>
+
+          {author.data.yearsExperience && (
+            <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+              <strong style="color: var(--ink);">{author.data.yearsExperience}+ years</strong> in the pet industry
+            </div>
+          )}
+
+          {author.data.specialties && author.data.specialties.length > 0 && (
+            <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
+              <strong style="color: var(--ink);">Specialties:</strong> {author.data.specialties.join(', ')}
+            </div>
+          )}
+
+          <!-- External links -->
+          {author.data.links && (
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+              {author.data.links.email && (
+                <a href={`mailto:${author.data.links.email}`} style="font-size: 0.9rem;">
+                  Email
+                </a>
+              )}
+              {author.data.links.linkedin && (
+                <a href={author.data.links.linkedin} rel="noopener" target="_blank" style="font-size: 0.9rem;">
+                  LinkedIn
+                </a>
+              )}
+              {author.data.links.website && (
+                <a href={author.data.links.website} rel="noopener" target="_blank" style="font-size: 0.9rem;">
+                  Website
+                </a>
+              )}
+              {author.data.links.twitter && (
+                <a href={author.data.links.twitter} rel="noopener" target="_blank" style="font-size: 0.9rem;">
+                  Twitter
+                </a>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Long bio content -->
+  <div class="page-content prose">
+    <Content />
+  </div>
+
+  <!-- Author's recent work -->
+  {totalPosts > 0 && (
+    <section style="background: var(--bg-alt); padding: 4rem 1rem; margin-top: 3rem;">
+      <div class="container">
+        <h2 style="margin-top: 0; margin-bottom: 2rem;">Recent Work by {author.data.name}</h2>
+
+        <div class="card-grid">
+          {reviewsByAuthor.slice(0, 3).map((post) => {
+            const cat = PET_CATEGORIES.find((c) => c.slug === post.data.pet);
+            return (
+              <article class="post-card">
+                <a href={`/reviews/${post.data.pet}/${post.slug}/`}>
+                  <div class="post-card-image">
+                    <img
+                      src={typeof post.data.heroImage === 'string' ? post.data.heroImage : post.data.heroImage.src}
+                      alt={post.data.heroImageAlt}
+                      loading="lazy"
+                    />
+                  </div>
+                  <div class="post-card-body">
+                    <div class="post-card-category">{cat?.name} · Review</div>
+                    <h3 class="post-card-title">{post.data.title}</h3>
+                    <p class="post-card-excerpt">{post.data.description}</p>
+                  </div>
+                </a>
+              </article>
+            );
+          })}
+
+          {guidesByAuthor.slice(0, 3).map((post) => {
+            const cat = PET_CATEGORIES.find((c) => c.slug === post.data.pet);
+            return (
+              <article class="post-card">
+                <a href={`/guides/${post.data.pet}/${post.slug}/`}>
+                  <div class="post-card-image">
+                    <img
+                      src={typeof post.data.heroImage === 'string' ? post.data.heroImage : post.data.heroImage.src}
+                      alt={post.data.heroImageAlt}
+                      loading="lazy"
+                    />
+                  </div>
+                  <div class="post-card-body">
+                    <div class="post-card-category">{cat?.name} · Guide</div>
+                    <h3 class="post-card-title">{post.data.title}</h3>
+                    <p class="post-card-excerpt">{post.data.description}</p>
+                  </div>
+                </a>
+              </article>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <style>
+    @media (max-width: 640px) {
+      .author-header {
+        grid-template-columns: 1fr !important;
+        text-align: center;
+      }
+      .author-header img {
+        max-width: 180px;
+        margin: 0 auto;
+      }
+    }
+  </style>
+</BaseLayout>

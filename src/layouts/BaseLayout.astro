@@ -1,0 +1,243 @@
+---
+// ============================================================
+// BASE LAYOUT — The master template
+// ============================================================
+// Every page on your site is wrapped by this layout. It provides:
+//  • The HTML document structure (doctype, head, body)
+//  • All the SEO meta tags (title, description, Open Graph, Twitter)
+//  • The site header with your logo and navigation
+//  • The site footer with legal links and disclosure
+//  • The cookie consent script (where it'll be inserted)
+//
+// If you want to add something to EVERY page — a Google Analytics
+// script, a new footer link, an announcement bar — you add it
+// HERE, once, and it appears on all pages automatically.
+// ============================================================
+
+import { SITE, NAV, DISCLOSURE } from '../consts.js';
+import '../styles/global.css';
+
+// Props this layout accepts from the page using it
+interface Props {
+  title: string;              // Page title (appears in browser tab + SEO)
+  description: string;        // Meta description (for SEO)
+  image?: string;             // Social share image (Open Graph)
+  canonical?: string;         // Override the canonical URL if needed
+  noindex?: boolean;          // Hide this page from search engines
+  articleType?: 'website' | 'article';  // For Open Graph typing
+}
+
+const {
+  title,
+  description,
+  image = '/pet-gotopro-logo.png',
+  canonical,
+  noindex = false,
+  articleType = 'website',
+} = Astro.props;
+
+// Build the full page title including the site name
+const fullTitle = title === SITE.name ? title : `${title} | ${SITE.name}`;
+
+// Build the canonical URL (the "official" URL of this page for SEO)
+const canonicalURL = canonical || new URL(Astro.url.pathname, Astro.site).toString();
+
+// Build absolute URLs for social sharing
+const socialImage = new URL(image, Astro.site).toString();
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="generator" content={Astro.generator} />
+
+  <!-- Primary SEO tags -->
+  <title>{fullTitle}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={canonicalURL} />
+  {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+  <!-- Open Graph (Facebook, LinkedIn, Pinterest share previews) -->
+  <meta property="og:type" content={articleType} />
+  <meta property="og:site_name" content={SITE.name} />
+  <meta property="og:url" content={canonicalURL} />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:image" content={socialImage} />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- Twitter Card (Twitter share previews) -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={socialImage} />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/pet-gotopro-logo.png" />
+
+  <!-- Fonts: Inter (body) + Fraunces (headlines), self-hosted from Google via preconnect -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400;1,9..144,600&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Organization schema (every page carries this) -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": SITE.name,
+    "description": SITE.description,
+    "url": Astro.site?.toString(),
+    "logo": new URL('/pet-gotopro-logo.png', Astro.site).toString(),
+    "email": SITE.email,
+  })} />
+
+  <!-- RSS feed auto-discovery -->
+  <link rel="alternate" type="application/rss+xml" title={SITE.name} href="/rss.xml" />
+</head>
+
+<body>
+  <!-- Skip link for keyboard users (accessibility) -->
+  <a href="#main" class="skip-link">Skip to main content</a>
+
+  <!-- ============================================================
+       SITE HEADER
+       ============================================================ -->
+  <header class="site-header">
+    <div class="header-inner">
+      <!-- Logo + name -->
+      <a href="/" class="site-logo-link" aria-label={`${SITE.name} home`}>
+        <img src="/pet-gotopro-logo.png" alt="" width="56" height="56" />
+        <span class="site-logo-text">
+          <span class="site-logo-name">{SITE.fullName}</span>
+          <span class="site-logo-tagline">{SITE.tagline}</span>
+        </span>
+      </a>
+
+      <!-- Mobile nav toggle (shows only on narrow screens) -->
+      <button
+        class="mobile-toggle"
+        aria-label="Toggle navigation menu"
+        aria-expanded="false"
+        aria-controls="main-nav"
+        id="mobile-toggle"
+      >
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+
+      <!-- Main navigation -->
+      <nav class="main-nav" id="main-nav" aria-label="Main navigation">
+        {NAV.map((item) => (
+          <div class="nav-item">
+            <a
+              href={item.href}
+              class="nav-link"
+              aria-current={Astro.url.pathname === item.href ? 'page' : undefined}
+            >
+              {item.label}
+            </a>
+            {item.children && (
+              <ul class="nav-dropdown" role="menu">
+                {item.children.map((child) => (
+                  <li role="none">
+                    <a href={child.href} role="menuitem">{child.label}</a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        ))}
+      </nav>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       MAIN CONTENT (each page slots in here)
+       ============================================================ -->
+  <main id="main">
+    <slot />
+  </main>
+
+  <!-- ============================================================
+       SITE FOOTER
+       ============================================================ -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <!-- Brand column -->
+        <div class="footer-brand">
+          <img src="/pet-gotopro-logo.png" alt={`${SITE.name} logo`} width="64" height="64" />
+          <div class="footer-brand-name">{SITE.fullName}</div>
+          <div class="footer-brand-tagline">{SITE.tagline}</div>
+          <p style="font-size: 0.85rem; color: #9ca3af; line-height: 1.6;">
+            {SITE.description}
+          </p>
+        </div>
+
+        <!-- Explore column -->
+        <div>
+          <h4>Explore</h4>
+          <ul class="footer-links">
+            <li><a href="/reviews/">Product Reviews</a></li>
+            <li><a href="/guides/">Guides</a></li>
+            <li><a href="/shop/">Shop by Pet</a></li>
+            <li><a href="/news/">News</a></li>
+          </ul>
+        </div>
+
+        <!-- About column -->
+        <div>
+          <h4>About</h4>
+          <ul class="footer-links">
+            <li><a href="/about/">About Us</a></li>
+            <li><a href="/editorial-policy/">Editorial Policy</a></li>
+            <li><a href="/how-we-test/">How We Test</a></li>
+            <li><a href="/contact/">Contact</a></li>
+          </ul>
+        </div>
+
+        <!-- Legal column -->
+        <div>
+          <h4>Legal</h4>
+          <ul class="footer-links">
+            <li><a href="/affiliate-disclosure/">Affiliate Disclosure</a></li>
+            <li><a href="/privacy/">Privacy Policy</a></li>
+            <li><a href="/cookie-policy/">Cookie Policy</a></li>
+            <li><a href="/terms/">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Required Amazon Associates disclosure (every page) -->
+      <div class="footer-disclosure">
+        <strong>{DISCLOSURE.footerShort}</strong> Pet-GoToPro.com also participates in other affiliate programs and may earn a commission when you purchase through links on our site, at no extra cost to you. Pet-GoToPro provides general pet care information and is not a substitute for professional veterinary advice. Always consult a licensed veterinarian about your pet's health.
+      </div>
+
+      <!-- Footer bottom bar -->
+      <div class="footer-bottom">
+        <div>© {new Date().getFullYear()} {SITE.name}. All rights reserved.</div>
+        <div>Made with 💙 for the pet-parent community.</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Mobile nav toggle script — tiny inline JS, no framework needed -->
+  <script>
+    const toggle = document.getElementById('mobile-toggle');
+    const nav = document.getElementById('main-nav');
+    if (toggle && nav) {
+      toggle.addEventListener('click', () => {
+        const isOpen = nav.classList.toggle('open');
+        toggle.setAttribute('aria-expanded', String(isOpen));
+      });
+    }
+  </script>
+</body>
+</html>

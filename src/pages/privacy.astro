@@ -1,0 +1,128 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../consts.js';
+---
+
+<BaseLayout
+  title="Privacy Policy"
+  description="Pet-GoToPro's privacy policy — what information we collect, how we use it, your rights under GDPR and CCPA, and how to contact us about your data."
+>
+  <section class="category-hero">
+    <div class="container-narrow">
+      <div class="breadcrumbs">
+        <a href="/">Home</a> › <span aria-current="page">Privacy Policy</span>
+      </div>
+      <h1>Privacy Policy</h1>
+      <p class="hero-lede">
+        Plain-language explanation of what we collect, what we don't, and your rights over your own data.
+      </p>
+    </div>
+  </section>
+
+  <div class="page-content prose">
+    <p style="background: var(--bg-warm); border-left: 3px solid var(--cta); padding: 1rem 1.5rem; border-radius: 0 var(--radius) var(--radius) 0;">
+      <strong>The short version:</strong> We collect very little information about you. We don't sell your data. We use privacy-friendly analytics that don't track you across sites. You have legal rights to access, correct, or delete any data we do have, and we'll help you exercise those rights without hassle.
+    </p>
+
+    <p style="color: var(--text-muted); font-size: 0.9rem;">
+      <em>Effective date: April 2026 · Last updated: April 2026</em>
+    </p>
+
+    <h2>Who this policy applies to</h2>
+    <p>
+      This privacy policy describes how Pet-GoToPro.com ("Pet-GoToPro," "we," "us," "our") collects, uses, and protects information when you visit our website, subscribe to our newsletter, or contact us. It applies to everyone who interacts with our site, regardless of location, though specific legal rights vary by jurisdiction as explained below.
+    </p>
+
+    <h2>What information we collect</h2>
+
+    <h3>Information you provide voluntarily</h3>
+    <p>
+      When you fill out our contact form, we collect your name, email address, and the content of your message. When you subscribe to our newsletter, we collect your email address. When you email us directly, we receive whatever information you choose to include in that email. We only use this information for the purpose you provided it — responding to your message, sending the newsletter you subscribed to, and so on.
+    </p>
+
+    <h3>Information collected automatically</h3>
+    <p>
+      When you visit our website, our hosting provider and analytics service automatically receive standard technical information that every website collects, including your approximate geographic location derived from your IP address, the type of device and browser you're using, which pages you visited on our site, and which external site (if any) referred you to us. This is the same information any website receives whenever anyone visits — it's how the web works at a basic level.
+    </p>
+    <p>
+      We use <strong>Cloudflare Web Analytics</strong>, which is privacy-friendly by design. It does not use cookies, does not build profiles about individual visitors, does not track you across other websites, and aggregates all data so we can see things like "this article was popular this week" without ever seeing anything about you as an individual. We specifically chose this analytics tool over alternatives like Google Analytics because it respects your privacy.
+    </p>
+
+    <h3>Cookies</h3>
+    <p>
+      Our site uses very few cookies. We do not set cookies for advertising, cross-site tracking, or analytics. The only cookies that may be set come from affiliate link clicks (when you click an affiliate link, the destination retailer like Amazon may set a cookie to track that you arrived from us, which is how commission attribution works), and optionally from embedded third-party content like YouTube videos if we embed any. Our <a href="/cookie-policy/">Cookie Policy</a> explains this in more detail and tells you how to control cookies in your browser.
+    </p>
+
+    <h2>How we use your information</h2>
+    <p>
+      We use the information we collect only for the purposes you'd reasonably expect. That means responding to messages you send us, delivering the newsletter you subscribed to, understanding in aggregate which content our readers find valuable so we can produce more of it, detecting and preventing spam and security threats, and complying with legal obligations when they arise.
+    </p>
+    <p>
+      We do not sell, rent, lease, or trade your personal information to third parties. We do not share your email address with anyone else. We do not build advertising profiles. We do not use your data for any purpose other than running this website and communicating with you when you've asked us to.
+    </p>
+
+    <h2>Third-party services we use</h2>
+    <p>
+      To run Pet-GoToPro, we rely on a few third-party services that each receive specific pieces of information. <strong>Cloudflare</strong> hosts our website and processes the technical information described above. <strong>Web3Forms</strong> processes our contact form submissions. <strong>MailerLite</strong> (if used) handles our email newsletter subscriptions. <strong>Amazon</strong> and other affiliate partners receive information about clicks on their affiliate links, as is standard for affiliate programs. Each of these services has its own privacy policy governing how it handles your data, and each is contractually obligated to protect that data appropriately.
+    </p>
+
+    <h2>Your rights</h2>
+
+    <h3>If you're in the European Union, United Kingdom, or European Economic Area</h3>
+    <p>
+      Under the General Data Protection Regulation (GDPR) and the UK Data Protection Act, you have the right to access the personal data we hold about you, correct it if it's inaccurate, request its deletion, restrict how we process it, receive a copy in a portable format, object to certain types of processing, and withdraw any consent you've previously given. You also have the right to lodge a complaint with your local data protection authority if you believe we've mishandled your data. To exercise any of these rights, email us at <a href={`mailto:${SITE.email}`}>{SITE.email}</a> and we'll respond within 30 days at the latest.
+    </p>
+
+    <h3>If you're in California</h3>
+    <p>
+      Under the California Consumer Privacy Act (CCPA) and the California Privacy Rights Act (CPRA), you have the right to know what personal information we've collected about you, delete it, correct it, opt out of any "sale" or "sharing" of that information (though we don't sell or share personal information in the meaningful sense of those terms), and not be discriminated against for exercising any of these rights. Our site respects Global Privacy Control signals automatically, so if you have GPC enabled in your browser, we treat that as an opt-out request without any further action required. If you want to exercise any CCPA rights manually, email us at <a href={`mailto:${SITE.email}`}>{SITE.email}</a> and we'll respond within 45 days.
+    </p>
+
+    <h3>If you're anywhere else</h3>
+    <p>
+      Even if your jurisdiction doesn't have a specific privacy law giving you these rights, we extend them to you anyway as a matter of policy. Email us at <a href={`mailto:${SITE.email}`}>{SITE.email}</a> with any data request and we'll handle it the same way we'd handle a formal GDPR request.
+    </p>
+
+    <h2>How long we keep data</h2>
+    <p>
+      We keep contact form submissions for up to two years so we can reference the history of a conversation if you write to us again. We keep newsletter subscriber information for as long as you remain subscribed, and we delete it within 30 days after you unsubscribe. Aggregated analytics data (which doesn't identify you personally) may be kept indefinitely for historical trend analysis.
+    </p>
+
+    <h2>Security</h2>
+    <p>
+      We protect your information using industry-standard practices including HTTPS encryption for all site traffic, access controls on our systems, and vetting of the third-party services we rely on. No security measure is perfect, however, and we cannot guarantee absolute security. If we ever experience a data breach affecting your personal information, we'll notify you as required by applicable law.
+    </p>
+
+    <h2>Children's privacy</h2>
+    <p>
+      Pet-GoToPro is not directed at children under the age of 13, and we do not knowingly collect personal information from children under 13. If you believe we've inadvertently collected such information, please contact us immediately at <a href={`mailto:${SITE.email}`}>{SITE.email}</a> and we'll delete it promptly.
+    </p>
+
+    <h2>International data transfers</h2>
+    <p>
+      Our servers and service providers are located primarily in the United States. If you visit us from outside the U.S., your information will be transferred to the U.S. for processing. We rely on appropriate safeguards such as Standard Contractual Clauses where applicable to protect information transferred internationally.
+    </p>
+
+    <h2>Changes to this policy</h2>
+    <p>
+      We may update this privacy policy from time to time to reflect changes in our practices, the services we use, or applicable law. When we make material changes, we'll update the "Last updated" date at the top of this page and, where appropriate, notify subscribers by email. Your continued use of the site after changes take effect constitutes acceptance of the updated policy.
+    </p>
+
+    <h2>Contact us</h2>
+    <p>
+      If you have questions about this privacy policy, want to exercise any of your rights, or have concerns about how we handle your information, email us at <a href={`mailto:${SITE.email}`}>{SITE.email}</a>. We treat privacy questions as a priority and aim to respond within two business days, well ahead of the statutory deadlines in any applicable law.
+    </p>
+
+    <!--
+      NOTE TO SITE OWNER:
+      Some jurisdictions (notably the EU) require you to list the
+      legal entity name and physical address of the data controller.
+      Once you formalize the business entity for Pet-GoToPro, add
+      a section here with that information. A PO Box is acceptable.
+    -->
+
+    <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border);">
+      <em>This privacy policy was last updated in April 2026.</em>
+    </p>
+  </div>
+</BaseLayout>

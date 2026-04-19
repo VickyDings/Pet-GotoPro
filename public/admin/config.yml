@@ -1,0 +1,193 @@
+# ============================================================
+# DECAP CMS CONFIGURATION
+# ============================================================
+# This file defines what editing forms appear in your admin
+# panel at /admin/. Each "collection" below becomes a section
+# in the admin navigation (Reviews, Guides, News, Authors,
+# and so on), and each "field" within a collection becomes
+# an input field in the editing form.
+#
+# When you want to add a new field to posts (say, a "Price
+# Range" dropdown), you add it here. When you want to create
+# a new type of content (say, "Recipes"), you add a new
+# collection here.
+# ============================================================
+
+# BACKEND: This tells Decap where to save your content.
+# We use GitHub because Cloudflare Pages builds from GitHub.
+# "editorial_workflow" enables a draft/review/publish flow
+# instead of committing changes directly.
+backend:
+  name: github
+  repo: YOUR-GITHUB-USERNAME/pet-gotopro # CHANGE THIS to match your repo
+  branch: main
+  base_url: https://api.netlify.com # Decap uses Netlify's free OAuth proxy
+  auth_endpoint: auth
+
+# LOCAL DEVELOPMENT: when running the site on your own computer
+# during development, set this to use local files instead of
+# committing to GitHub on every save. Run "npx decap-server" in
+# a separate terminal window to enable.
+local_backend: true
+
+# MEDIA: Where uploaded images get stored.
+# "media_folder" is where files get saved in your repo.
+# "public_folder" is how they're referenced in your content.
+media_folder: "src/assets/uploads"
+public_folder: "/src/assets/uploads"
+
+# SITE URL (used in preview mode)
+site_url: https://pet-gotopro.com
+display_url: https://pet-gotopro.com
+
+# ============================================================
+# COLLECTIONS — The types of content you can edit
+# ============================================================
+
+collections:
+  # ----------------------------------------------------------
+  # REVIEWS — Product review articles
+  # ----------------------------------------------------------
+  - name: "reviews"
+    label: "Product Reviews"
+    label_singular: "Review"
+    description: "In-depth product reviews. Each review lives under its pet category folder."
+    folder: "src/content/reviews"
+    create: true
+    # The {{fields.pet}}/{{slug}} pattern puts the file in the
+    # right pet folder based on the Pet dropdown selection
+    path: "{{fields.pet}}/{{slug}}"
+    slug: "{{slug}}"
+    preview_path: "reviews/{{fields.pet}}/{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string", hint: "The article's main headline. 50-70 characters is ideal for SEO." }
+      - { label: "Description", name: "description", widget: "text", hint: "1-2 sentence summary for Google and social shares. 140-160 characters ideal." }
+      - label: "Pet Category"
+        name: "pet"
+        widget: "select"
+        options:
+          - { label: "Dogs", value: "dogs" }
+          - { label: "Cats", value: "cats" }
+          - { label: "Birds", value: "birds" }
+          - { label: "Reptiles", value: "reptiles" }
+          - { label: "Aquatics", value: "aquatics" }
+          - { label: "Small Animals", value: "small-animals" }
+      - { label: "Hero Image", name: "heroImage", widget: "image", hint: "The main photo at the top of the article." }
+      - { label: "Hero Image Alt Text", name: "heroImageAlt", widget: "string", hint: "Describe the image in one sentence for screen readers and SEO." }
+      - { label: "Publish Date", name: "pubDate", widget: "datetime", format: "YYYY-MM-DD" }
+      - { label: "Updated Date", name: "updatedDate", widget: "datetime", format: "YYYY-MM-DD", required: false }
+      - { label: "Author", name: "author", widget: "relation", collection: "authors", search_fields: ["name"], value_field: "{{slug}}", display_fields: ["name"], default: "editorial-team" }
+      - { label: "Veterinary Reviewer (optional)", name: "vetReviewer", widget: "string", required: false, hint: "For health-related content, the name and credentials of the reviewing vet." }
+      - { label: "Featured on Homepage?", name: "featured", widget: "boolean", default: false }
+      - { label: "Draft Mode", name: "draft", widget: "boolean", default: false, hint: "Drafts do not appear on the live site." }
+      - { label: "Tags", name: "tags", widget: "list", required: false, hint: "Optional tags like 'budget', 'premium', 'senior-pet' for cross-referencing." }
+      - { label: "Number of Products Reviewed", name: "productCount", widget: "number", required: false }
+      - { label: "Article Body", name: "body", widget: "markdown", hint: "The main content. Use ## for section headings, and you can paste in HTML when needed." }
+
+  # ----------------------------------------------------------
+  # GUIDES — Care guides and informational articles
+  # ----------------------------------------------------------
+  - name: "guides"
+    label: "Care Guides"
+    label_singular: "Guide"
+    description: "Care guides, how-tos, and informational articles organized by pet."
+    folder: "src/content/guides"
+    create: true
+    path: "{{fields.pet}}/{{slug}}"
+    slug: "{{slug}}"
+    preview_path: "guides/{{fields.pet}}/{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Description", name: "description", widget: "text" }
+      - label: "Pet Category"
+        name: "pet"
+        widget: "select"
+        options:
+          - { label: "Dogs", value: "dogs" }
+          - { label: "Cats", value: "cats" }
+          - { label: "Birds", value: "birds" }
+          - { label: "Reptiles", value: "reptiles" }
+          - { label: "Aquatics", value: "aquatics" }
+          - { label: "Small Animals", value: "small-animals" }
+      - { label: "Hero Image", name: "heroImage", widget: "image" }
+      - { label: "Hero Image Alt Text", name: "heroImageAlt", widget: "string" }
+      - { label: "Publish Date", name: "pubDate", widget: "datetime", format: "YYYY-MM-DD" }
+      - { label: "Updated Date", name: "updatedDate", widget: "datetime", format: "YYYY-MM-DD", required: false }
+      - { label: "Author", name: "author", widget: "relation", collection: "authors", search_fields: ["name"], value_field: "{{slug}}", display_fields: ["name"], default: "editorial-team" }
+      - { label: "Veterinary Reviewer (optional)", name: "vetReviewer", widget: "string", required: false }
+      - { label: "Reading Time (minutes)", name: "readingTime", widget: "number", required: false }
+      - { label: "Featured on Homepage?", name: "featured", widget: "boolean", default: false }
+      - { label: "Draft Mode", name: "draft", widget: "boolean", default: false }
+      - { label: "Tags", name: "tags", widget: "list", required: false }
+      - { label: "Article Body", name: "body", widget: "markdown" }
+
+  # ----------------------------------------------------------
+  # NEWS — Time-sensitive news articles
+  # ----------------------------------------------------------
+  - name: "news"
+    label: "News"
+    label_singular: "News Post"
+    description: "Recalls, industry news, and time-sensitive updates."
+    folder: "src/content/news"
+    create: true
+    slug: "{{slug}}"
+    preview_path: "news/{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Description", name: "description", widget: "text" }
+      - { label: "Hero Image", name: "heroImage", widget: "image" }
+      - { label: "Hero Image Alt Text", name: "heroImageAlt", widget: "string" }
+      - { label: "Publish Date", name: "pubDate", widget: "datetime", format: "YYYY-MM-DD" }
+      - { label: "Author", name: "author", widget: "relation", collection: "authors", search_fields: ["name"], value_field: "{{slug}}", display_fields: ["name"], default: "editorial-team" }
+      - label: "Urgency"
+        name: "urgency"
+        widget: "select"
+        options:
+          - { label: "Info", value: "info" }
+          - { label: "Alert", value: "alert" }
+          - { label: "Breaking", value: "breaking" }
+        default: "info"
+      - label: "Relevant Pets (optional)"
+        name: "pets"
+        widget: "select"
+        multiple: true
+        required: false
+        options:
+          - { label: "Dogs", value: "dogs" }
+          - { label: "Cats", value: "cats" }
+          - { label: "Birds", value: "birds" }
+          - { label: "Reptiles", value: "reptiles" }
+          - { label: "Aquatics", value: "aquatics" }
+          - { label: "Small Animals", value: "small-animals" }
+      - { label: "Featured on Homepage?", name: "featured", widget: "boolean", default: false }
+      - { label: "Draft Mode", name: "draft", widget: "boolean", default: false }
+      - { label: "Article Body", name: "body", widget: "markdown" }
+
+  # ----------------------------------------------------------
+  # AUTHORS — Contributor profiles
+  # ----------------------------------------------------------
+  - name: "authors"
+    label: "Authors"
+    label_singular: "Author"
+    description: "Contributor profiles with credentials and photos."
+    folder: "src/content/authors"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Full Name", name: "name", widget: "string" }
+      - { label: "Role", name: "role", widget: "string", hint: "e.g., Founder & Editor, Veterinary Reviewer, Contributing Writer" }
+      - { label: "Short Bio", name: "shortBio", widget: "text", hint: "2-3 sentences for the card that appears under articles." }
+      - { label: "Profile Photo", name: "photo", widget: "image" }
+      - { label: "Credentials", name: "credentials", widget: "list", required: false, hint: "Professional certifications like DVM, CPDT-KA, etc." }
+      - { label: "Years of Experience", name: "yearsExperience", widget: "number", required: false }
+      - { label: "Specialties", name: "specialties", widget: "list", required: false }
+      - label: "External Links"
+        name: "links"
+        widget: "object"
+        required: false
+        fields:
+          - { label: "Email", name: "email", widget: "string", required: false }
+          - { label: "LinkedIn URL", name: "linkedin", widget: "string", required: false }
+          - { label: "Personal Website", name: "website", widget: "string", required: false }
+          - { label: "Twitter URL", name: "twitter", widget: "string", required: false }
+      - { label: "Long Biography", name: "body", widget: "markdown", hint: "The full bio that appears on the author page." }

@@ -1,0 +1,169 @@
+---
+// ============================================================
+// HOMEPAGE
+// ============================================================
+// This is what visitors see when they go to pet-gotopro.com.
+// Its job is to do three things in the first screen:
+//   1. Tell visitors what this site IS (hero)
+//   2. Show what pet categories are covered (category grid)
+//   3. Surface the latest/featured content (recent posts)
+// ============================================================
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE, PET_CATEGORIES } from '../consts.js';
+import { getCollection } from 'astro:content';
+
+// Fetch the most recent reviews (top 6) that aren't drafts
+const allReviews = await getCollection('reviews', ({ data }) => !data.draft);
+const recentReviews = allReviews
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 6);
+
+// Fetch the most recent guides (top 3)
+const allGuides = await getCollection('guides', ({ data }) => !data.draft);
+const recentGuides = allGuides
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3);
+---
+
+<BaseLayout
+  title={SITE.name}
+  description={SITE.description}
+>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container-narrow">
+      <div style="margin-bottom: 1.5rem;">
+        <img
+          src="/pet-gotopro-logo.png"
+          alt=""
+          width="120"
+          height="120"
+          style="border-radius: 20px; margin: 0 auto; display: block;"
+        />
+      </div>
+      <h1>Trusted pet advice, tested gear, real pet parents.</h1>
+      <p class="hero-lede">
+        Honest product reviews and care guides for dogs, cats, birds, reptiles, aquatics, and small animals — so you can spend less time researching and more time with your pet.
+      </p>
+      <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="/reviews/" class="btn btn-primary">Browse Reviews</a>
+        <a href="/guides/" class="btn btn-secondary">Read Guides</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATEGORY GRID -->
+  <section class="container" style="padding: 4rem 1rem;">
+    <div style="text-align: center; margin-bottom: 3rem;">
+      <h2 style="margin-top: 0;">Find your pet</h2>
+      <p style="color: var(--text-muted); max-width: 560px; margin: 1rem auto 0;">
+        Every pet is different, so every guide is species-specific. Pick your companion to jump to reviews and care resources tailored to them.
+      </p>
+    </div>
+
+    <div class="category-grid">
+      {PET_CATEGORIES.map((cat) => (
+        <a href={`/reviews/${cat.slug}/`} class="category-card">
+          <div class="category-icon" style={`color: ${cat.color};`}>{cat.icon}</div>
+          <h3>{cat.name}</h3>
+          <p>{cat.description}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- RECENT REVIEWS -->
+  {recentReviews.length > 0 && (
+    <section style="background: var(--bg-alt); padding: 4rem 1rem;">
+      <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+          <h2 style="margin: 0;">Latest Product Reviews</h2>
+          <a href="/reviews/" style="color: var(--primary); font-weight: 600; font-size: 0.95rem;">
+            See all reviews →
+          </a>
+        </div>
+
+        <div class="card-grid">
+          {recentReviews.map((post) => {
+            const cat = PET_CATEGORIES.find((c) => c.slug === post.data.pet);
+            return (
+              <article class="post-card">
+                <a href={`/reviews/${post.data.pet}/${post.slug}/`}>
+                  <div class="post-card-image">
+                    <img
+                      src={typeof post.data.heroImage === 'string' ? post.data.heroImage : post.data.heroImage.src}
+                      alt={post.data.heroImageAlt}
+                      loading="lazy"
+                    />
+                  </div>
+                  <div class="post-card-body">
+                    <div class="post-card-category">{cat?.name || post.data.pet}</div>
+                    <h3 class="post-card-title">{post.data.title}</h3>
+                    <p class="post-card-excerpt">{post.data.description}</p>
+                    <div class="post-card-meta">
+                      {new Date(post.data.pubDate).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                      })}
+                    </div>
+                  </div>
+                </a>
+              </article>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- RECENT GUIDES -->
+  {recentGuides.length > 0 && (
+    <section class="container" style="padding: 4rem 1rem;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <h2 style="margin: 0;">Fresh From the Guides</h2>
+        <a href="/guides/" style="color: var(--primary); font-weight: 600; font-size: 0.95rem;">
+          See all guides →
+        </a>
+      </div>
+
+      <div class="card-grid">
+        {recentGuides.map((post) => {
+          const cat = PET_CATEGORIES.find((c) => c.slug === post.data.pet);
+          return (
+            <article class="post-card">
+              <a href={`/guides/${post.data.pet}/${post.slug}/`}>
+                <div class="post-card-image">
+                  <img
+                    src={typeof post.data.heroImage === 'string' ? post.data.heroImage : post.data.heroImage.src}
+                    alt={post.data.heroImageAlt}
+                    loading="lazy"
+                  />
+                </div>
+                <div class="post-card-body">
+                  <div class="post-card-category">{cat?.name || post.data.pet}</div>
+                  <h3 class="post-card-title">{post.data.title}</h3>
+                  <p class="post-card-excerpt">{post.data.description}</p>
+                </div>
+              </a>
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  )}
+
+  <!-- TRUST BLOCK — signals why visitors should trust this site -->
+  <section style="background: var(--primary); color: white; padding: 4rem 1rem;">
+    <div class="container-narrow" style="text-align: center;">
+      <h2 style="color: white; margin-top: 0;">Why Pet-GoToPro?</h2>
+      <p style="font-size: 1.1rem; line-height: 1.7; color: rgba(255,255,255,0.9); max-width: 720px; margin: 1.5rem auto;">
+        Every product we recommend is researched against verified owner reviews, expert testing, and manufacturer specs. We don't accept free products in exchange for positive reviews, and we label every sponsored or affiliate link clearly. When a product doesn't live up to the marketing, we say so.
+      </p>
+      <a href="/how-we-test/" class="btn" style="background: white; color: var(--primary-dark); margin-top: 1rem;">
+        How we test →
+      </a>
+    </div>
+  </section>
+</BaseLayout>

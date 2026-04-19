@@ -1,0 +1,236 @@
+---
+// ============================================================
+// INDIVIDUAL REVIEW POST — /reviews/[pet]/[slug]/
+// ============================================================
+// This template renders a single review article. It uses two
+// dynamic parameters — the pet category AND the post slug —
+// and getStaticPaths produces one page for every review file
+// in every pet folder. The article body itself comes from the
+// Markdown file's content, rendered through Astro's built-in
+// Content.render() method.
+// ============================================================
+
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { SITE, PET_CATEGORIES, DISCLOSURE } from '../../../consts.js';
+import { getCollection, getEntry } from 'astro:content';
+
+export async function getStaticPaths() {
+  const reviews = await getCollection('reviews', ({ data }) => !data.draft);
+  return reviews.map((post) => ({
+    params: { pet: post.data.pet, slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+
+const category = PET_CATEGORIES.find((c) => c.slug === post.data.pet);
+
+// Try to load author info (optional — don't break if missing)
+let author = null;
+try {
+  author = await getEntry('authors', post.data.author);
+} catch (e) {
+  // Author file doesn't exist yet, that's okay
+}
+
+// Get 3 related reviews from the same pet category (excluding this one)
+const allReviews = await getCollection('reviews', ({ data }) => !data.draft);
+const relatedReviews = allReviews
+  .filter((r) => r.data.pet === post.data.pet && r.slug !== post.slug)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3);
+
+// Format dates for display
+const formatDate = (date) =>
+  new Date(date).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+
+// Get absolute image URL for social sharing
+const heroSrc =
+  typeof post.data.heroImage === 'string' ? post.data.heroImage : post.data.heroImage.src;
+
+// Build schema.org JSON-LD for this article
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: post.data.title,
+  description: post.data.description,
+  image: new URL(heroSrc, Astro.site).toString(),
+  datePublished: post.data.pubDate.toISOString(),
+  dateModified: (post.data.updatedDate || post.data.pubDate).toISOString(),
+  author: {
+    '@type': author ? 'Person' : 'Organization',
+    name: author?.data.name || SITE.name,
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: SITE.name,
+    logo: {
+      '@type': 'ImageObject',
+      url: new URL('/pet-gotopro-logo.png', Astro.site).toString(),
+    },
+  },
+};
+
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: Astro.site?.toString() },
+    {
+      '@type': 'ListItem',
+      position: 2,
+      name: 'Reviews',
+      item: new URL('/reviews/', Astro.site).toString(),
+    },
+    {
+      '@type': 'ListItem',
+      position: 3,
+      name: category?.name || post.data.pet,
+      item: new URL(`/reviews/${post.data.pet}/`, Astro.site).toString(),
+    },
+    {
+      '@type': 'ListItem',
+      position: 4,
+      name: post.data.title,
+      item: new URL(Astro.url.pathname, Astro.site).toString(),
+    },
+  ],
+};
+---
+
+<BaseLayout
+  title={post.data.title}
+  description={post.data.description}
+  image={heroSrc}
+  articleType="article"
+>
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(articleSchema)} />
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(breadcrumbSchema)} />
+
+  <article>
+    <!-- Article header -->
+    <div class="container-narrow" style="padding: 2rem 1rem 0;">
+      <div class="breadcrumbs">
+        <a href="/">Home</a> › <a href="/reviews/">Reviews</a> ›
+        <a href={`/reviews/${post.data.pet}/`}>{category?.name || post.data.pet}</a> ›
+        <span aria-current="page">{post.data.title}</span>
+      </div>
+
+      <div style="font-size: 0.85rem; color: var(--primary); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.75rem;">
+        {category?.name} · Review
+      </div>
+
+      <h1 style="margin-bottom: 1rem;">{post.data.title}</h1>
+
+      <p style="font-family: var(--font-display); font-style: italic; font-size: 1.2rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.5rem;">
+        {post.data.description}
+      </p>
+
+      <div class="article-meta">
+        {author && (
+          <span>
+            <strong>By:</strong>{' '}
+            <a href={`/authors/${author.slug}/`}>{author.data.name}</a>
+          </span>
+        )}
+        {post.data.vetReviewer && (
+          <span><strong>Medically reviewed by:</strong> {post.data.vetReviewer}</span>
+        )}
+        <span><strong>Published:</strong> {formatDate(post.data.pubDate)}</span>
+        {post.data.updatedDate && (
+          <span><strong>Updated:</strong> {formatDate(post.data.updatedDate)}</span>
+        )}
+      </div>
+    </div>
+
+    <!-- Hero image -->
+    <div class="container-narrow" style="padding: 1rem;">
+      <img
+        src={heroSrc}
+        alt={post.data.heroImageAlt}
+        style="width: 100%; border-radius: var(--radius-lg);"
+        loading="eager"
+      />
+    </div>
+
+    <!-- FTC / Amazon disclosure (required above first affiliate link) -->
+    <div class="container-narrow" style="padding: 1rem;">
+      <div class="disclosure-box">
+        <em>{DISCLOSURE.inArticle}</em>
+      </div>
+    </div>
+
+    <!-- Article body (rendered from Markdown) -->
+    <div class="page-content prose">
+      <Content />
+    </div>
+
+    <!-- Author card -->
+    {author && (
+      <div class="container-narrow" style="padding: 2rem 1rem;">
+        <div style="background: var(--bg-alt); border-radius: var(--radius-lg); padding: 2rem; display: flex; gap: 1.5rem; align-items: flex-start; flex-wrap: wrap;">
+          {author.data.photo && (
+            <img
+              src={typeof author.data.photo === 'string' ? author.data.photo : author.data.photo.src}
+              alt={author.data.name}
+              width="80"
+              height="80"
+              style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;"
+            />
+          )}
+          <div style="flex: 1; min-width: 200px;">
+            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.25rem;">
+              Written by
+            </div>
+            <h3 style="margin: 0 0 0.25rem; font-size: 1.25rem;">
+              <a href={`/authors/${author.slug}/`} style="color: var(--ink); text-decoration: none;">
+                {author.data.name}
+              </a>
+            </h3>
+            <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+              {author.data.role}
+            </div>
+            <p style="font-size: 0.95rem; line-height: 1.6; margin: 0;">
+              {author.data.shortBio}
+            </p>
+          </div>
+        </div>
+      </div>
+    )}
+  </article>
+
+  <!-- Related reviews -->
+  {relatedReviews.length > 0 && (
+    <section style="background: var(--bg-alt); padding: 4rem 1rem; margin-top: 4rem;">
+      <div class="container">
+        <h2 style="margin-top: 0; margin-bottom: 2rem;">More {category?.name} Reviews</h2>
+        <div class="card-grid">
+          {relatedReviews.map((r) => (
+            <article class="post-card">
+              <a href={`/reviews/${r.data.pet}/${r.slug}/`}>
+                <div class="post-card-image">
+                  <img
+                    src={typeof r.data.heroImage === 'string' ? r.data.heroImage : r.data.heroImage.src}
+                    alt={r.data.heroImageAlt}
+                    loading="lazy"
+                  />
+                </div>
+                <div class="post-card-body">
+                  <div class="post-card-category">{category?.name}</div>
+                  <h3 class="post-card-title">{r.data.title}</h3>
+                  <p class="post-card-excerpt">{r.data.description}</p>
+                </div>
+              </a>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+</BaseLayout>

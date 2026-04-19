@@ -1,0 +1,133 @@
+---
+// ============================================================
+// SHOP BY PET — Dynamic page combining reviews AND guides
+// ============================================================
+// Unlike the reviews or guides category pages (which show only
+// one content type), this Shop page surfaces EVERYTHING about
+// a specific pet — reviews, guides, even news items tagged
+// with that pet. It acts as a "one-stop" landing for anyone
+// who arrived knowing only what pet they have, not what they
+// want to read about yet.
+// ============================================================
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { PET_CATEGORIES } from '../../consts.js';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  return PET_CATEGORIES.map((cat) => ({
+    params: { pet: cat.slug },
+    props: { category: cat },
+  }));
+}
+
+const { category } = Astro.props;
+
+// Pull all content types for this pet
+const allReviews = await getCollection('reviews', ({ data }) => !data.draft);
+const allGuides = await getCollection('guides', ({ data }) => !data.draft);
+
+const reviews = allReviews
+  .filter((r) => r.data.pet === category.slug)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 6);
+
+const guides = allGuides
+  .filter((g) => g.data.pet === category.slug)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 6);
+
+const title = `Shop for ${category.name}`;
+const description = `The best of Pet-GoToPro for ${category.name.toLowerCase()} — curated product reviews, care guides, and expert picks in one place.`;
+---
+
+<BaseLayout title={title} description={description}>
+  <section class="category-hero" style={`background: linear-gradient(180deg, ${category.color}15, var(--bg));`}>
+    <div class="container">
+      <div class="breadcrumbs">
+        <a href="/">Home</a> › <a href="/shop/">Shop by Pet</a> › <span aria-current="page">{category.name}</span>
+      </div>
+      <div style="font-size: 4rem; margin-bottom: 1rem;">{category.icon}</div>
+      <h1>Everything for {category.name}</h1>
+      <p class="hero-lede">{category.description}</p>
+    </div>
+  </section>
+
+  <!-- Featured product reviews for this pet -->
+  {reviews.length > 0 && (
+    <section class="container" style="padding: 3rem 1rem;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <h2 style="margin: 0;">Top {category.name} Product Reviews</h2>
+        <a href={`/reviews/${category.slug}/`} style="color: var(--primary); font-weight: 600; font-size: 0.95rem;">
+          See all {category.name.toLowerCase()} reviews →
+        </a>
+      </div>
+
+      <div class="card-grid">
+        {reviews.map((post) => (
+          <article class="post-card">
+            <a href={`/reviews/${post.data.pet}/${post.slug}/`}>
+              <div class="post-card-image">
+                <img
+                  src={typeof post.data.heroImage === 'string' ? post.data.heroImage : post.data.heroImage.src}
+                  alt={post.data.heroImageAlt}
+                  loading="lazy"
+                />
+              </div>
+              <div class="post-card-body">
+                <div class="post-card-category">Review</div>
+                <h3 class="post-card-title">{post.data.title}</h3>
+                <p class="post-card-excerpt">{post.data.description}</p>
+              </div>
+            </a>
+          </article>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <!-- Care guides for this pet -->
+  {guides.length > 0 && (
+    <section style="background: var(--bg-alt); padding: 3rem 1rem;">
+      <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+          <h2 style="margin: 0;">{category.name} Care Guides</h2>
+          <a href={`/guides/${category.slug}/`} style="color: var(--primary); font-weight: 600; font-size: 0.95rem;">
+            See all {category.name.toLowerCase()} guides →
+          </a>
+        </div>
+
+        <div class="card-grid">
+          {guides.map((post) => (
+            <article class="post-card">
+              <a href={`/guides/${post.data.pet}/${post.slug}/`}>
+                <div class="post-card-image">
+                  <img
+                    src={typeof post.data.heroImage === 'string' ? post.data.heroImage : post.data.heroImage.src}
+                    alt={post.data.heroImageAlt}
+                    loading="lazy"
+                  />
+                </div>
+                <div class="post-card-body">
+                  <div class="post-card-category">Guide</div>
+                  <h3 class="post-card-title">{post.data.title}</h3>
+                  <p class="post-card-excerpt">{post.data.description}</p>
+                </div>
+              </a>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Fallback when no content exists yet -->
+  {reviews.length === 0 && guides.length === 0 && (
+    <div style="text-align: center; padding: 5rem 1rem; color: var(--text-muted);">
+      <p style="font-size: 1.1rem;">We're still preparing content for {category.name.toLowerCase()}.</p>
+      <p style="margin-top: 1rem;">
+        <a href="/">Return home</a> or <a href="/reviews/">browse other categories</a>.
+      </p>
+    </div>
+  )}
+</BaseLayout>

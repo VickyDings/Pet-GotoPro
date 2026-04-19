@@ -1,0 +1,107 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../consts.js';
+---
+
+<BaseLayout
+  title="How We Test"
+  description="Pet-GoToPro's testing methodology — how we evaluate products, what criteria we use, and why our process produces recommendations you can trust."
+>
+  <section class="category-hero">
+    <div class="container-narrow">
+      <div class="breadcrumbs">
+        <a href="/">Home</a> › <span aria-current="page">How We Test</span>
+      </div>
+      <h1>How We Test Products</h1>
+      <p class="hero-lede">
+        Real products, real conditions, honest evaluations. Here's exactly how we arrive at every recommendation we publish.
+      </p>
+    </div>
+  </section>
+
+  <div class="page-content prose">
+    <h2>Why testing methodology matters</h2>
+    <p>
+      It's easy to produce product reviews that look authoritative but aren't — copy the specs from the manufacturer's website, paraphrase a few Amazon reviews, pick the product with the highest commission rate, and call it a recommendation. That style of content dominates the affiliate internet because it's fast and cheap to produce. It's also nearly useless to readers, because recommendations based on nothing more than marketing copy and cherry-picked reviews have no reliable connection to actual product quality.
+    </p>
+    <p>
+      Pet-GoToPro exists because we think pet parents deserve better than that. This page documents the methodology we follow when evaluating products, so you can judge for yourself whether our process is thorough enough to produce recommendations you can trust. If at any point in reading this you think we could be doing something better, we want to hear about it. Email us at <a href={`mailto:${SITE.email}`}>{SITE.email}</a> with suggestions.
+    </p>
+
+    <h2>Step one: we define what good looks like</h2>
+    <p>
+      Before we evaluate any specific product, we think carefully about what the ideal product in that category would actually do. For a self-cleaning litter box, for instance, "ideal" means more than just "cleans automatically" — it means safe for cats of the specific sizes we're targeting, compatible with common litters, quiet enough not to disturb the household, odor-controlled, reliable over months of daily use, serviceable when things go wrong, and reasonably priced relative to the value delivered. These criteria get explicitly documented in the article so you can see what we were optimizing for. If your priorities differ from ours — maybe you need a box that works for cats weighing over 30 pounds when we optimized for cats under 20 — our documented criteria let you understand whether our recommendations apply to your situation.
+    </p>
+    <p>
+      We also identify disqualifying criteria. Some products fail a single test so badly that no other positive attribute can redeem them. A litter box with documented safety incidents gets eliminated no matter how affordable or feature-rich it is. A bird cage with bar spacing unsafe for the target species is off the list regardless of how attractive it looks. These are not ranking factors — they're eligibility gates.
+    </p>
+
+    <h2>Step two: we survey the market</h2>
+    <p>
+      Once we know what we're looking for, we identify the pool of products worth considering. We start broad — every product in the category that's currently available through major retailers — and narrow progressively. We eliminate products with fewer than a meaningful number of verified customer reviews, since we can't evaluate long-term reliability without a substantial user base. We eliminate products from manufacturers with consistent patterns of quality or customer service complaints, even when specific models seem promising. We pay particular attention to patterns in negative reviews: a handful of one-star reviews on any product is noise, but consistent complaints about the same specific failure mode across dozens of reviews is meaningful signal.
+    </p>
+    <p>
+      The survey process usually reduces an initial pool of twenty or thirty candidates to a shortlist of five to ten products worth testing in depth. When possible, we include candidates across multiple price tiers so the final article can serve readers with different budgets. When a category has a clear "best in class" product with no meaningful competitors at the top, we say so rather than manufacturing a false horse race.
+    </p>
+
+    <h2>Step three: we buy the products</h2>
+    <p>
+      For the products that make our testing shortlist, we purchase them ourselves through normal retail channels. We do not accept free review samples from manufacturers, with the rare exception of equipment that would be cost-prohibitive to purchase for review purposes (like the most expensive aquarium equipment or specialized reptile enclosures). When we do accept a sample, we disclose that fact prominently in the resulting article, and our review remains honest regardless of outcome.
+    </p>
+    <p>
+      Buying products at retail is slower and more expensive than accepting samples, but it protects the independence of our recommendations in ways that no formal ethics policy can guarantee on its own. It also ensures we experience the product the same way our readers will — including the packaging, the instructions, the customer service if we need support, and the actual retail pricing we'll be pointing readers toward.
+    </p>
+
+    <h2>Step four: we use the products in real conditions</h2>
+    <p>
+      Product testing on Pet-GoToPro means using the product in conditions that resemble how our readers will use it. For a litter box, that means installing it in an actual home with actual cats and running it through daily cycles for at least three weeks, during which time we're paying attention to noise, smell, reliability, cleaning requirements, and cat acceptance. For an aquarium filter, it means running it on an established aquarium for at least a month, measuring flow rates and noise output, observing how cleaning affects the biological filtration, and checking how well it handles heavy bio-loads. For a dog GPS tracker, it means actually attaching it to a dog and walking, driving, and testing range in varied environments for weeks.
+    </p>
+    <p>
+      Testing duration varies by product category. Some products reveal their quality within hours — a poorly-made perch cracks the first time a parrot lands on it hard. Others require months of continuous use to expose long-term weaknesses like motor failure, material degradation, or declining filtration capacity. We try to match our testing timeline to the meaningful duration for each product category, though we're honest when we've tested something for less time than we'd prefer due to deadline pressure or product availability.
+    </p>
+    <p>
+      Where possible, we test products across multiple households or use cases. A litter box that works beautifully in a single-cat home may behave very differently in a four-cat household. Testing across varied conditions gives us more confidence that our conclusions apply broadly rather than reflecting the quirks of a single testing environment.
+    </p>
+
+    <h2>Step five: we document what we find</h2>
+    <p>
+      During testing, we document observations systematically. We measure what's measurable — sound levels, temperature ranges, flow rates, weight capacities, battery life under defined conditions. We note qualitative observations that are harder to quantify but still important, like how intuitive the assembly is or how responsive customer service is when we contact them with a question. We take photographs of the product in use, not just the out-of-box glamour shots manufacturers provide. We keep notes on any problems that emerge during the testing period, including how they were resolved or whether they weren't.
+    </p>
+    <p>
+      When testing reveals something unexpected — a feature that doesn't work as advertised, a safety concern the manufacturer hasn't disclosed, a significantly better use case than the marketing suggests — we investigate further rather than ignoring the finding. Sometimes this means contacting the manufacturer for clarification, sometimes it means consulting with subject-matter experts, and sometimes it means extending the testing period to verify the observation isn't a fluke.
+    </p>
+
+    <h2>Step six: we write with our findings in hand</h2>
+    <p>
+      Only after all of this preparation do we write the article. The article's structure reflects our testing process: we state the criteria we used to evaluate products, name the specific products we tested, document what we found about each, and explain our rankings based on the evidence we gathered. If a product we expected to love disappointed us, we say so and explain why. If a product we didn't expect to like surprised us, we update our opinion honestly.
+    </p>
+    <p>
+      Rankings in our articles are genuine rankings based on our testing. The "best overall" pick is the product that best balances the criteria we identified as important for the category. Specialized picks — "best for large pets," "best budget option," "best for small spaces" — are genuine best-in-category recommendations for their specific use cases, not just runner-ups we're trying to justify including to pad the article length.
+    </p>
+
+    <h2>Ongoing product monitoring</h2>
+    <p>
+      Publication isn't the end of the testing process. We continue using the products we've reviewed after articles go live, and we watch for changes in the market that might affect our recommendations. When a previously-recommended product gets reformulated and degrades in quality, we update the article to reflect the change. When a new competitor enters the category and genuinely outperforms our previous top pick, we update the ranking. When a manufacturer changes pricing significantly, we note that in the article. When a product we recommended gets discontinued, we remove it and replace it with a current alternative.
+    </p>
+    <p>
+      The "Last updated" date at the top of each review article tells you when it was most recently refreshed. We don't update dates cosmetically to appear fresh in search results; the date reflects real review and revision.
+    </p>
+
+    <h2>Limitations we acknowledge openly</h2>
+    <p>
+      No testing methodology is perfect, and we want you to understand where ours falls short so you can weight our recommendations appropriately. Our testing pool is finite — we can't test every product in every category, so our recommendations are always "the best of what we tested" rather than "the best in the world." Testing duration is necessarily bounded by deadlines, meaning some long-term reliability issues may not emerge during our testing window. We test in the environments available to us, which may not perfectly match every reader's circumstances. And we're human, so we occasionally get things wrong despite our best efforts.
+    </p>
+    <p>
+      When our testing contradicts what others have found, we try to understand why before assuming we're right. When new information emerges that changes our conclusions, we update our articles. The methodology documented on this page represents our current best process — we expect to refine it continuously as we learn what works and what doesn't.
+    </p>
+
+    <h2>Questions or suggestions</h2>
+    <p>
+      If you think there's something we should test that we haven't, a methodology improvement we should consider, or a specific claim in one of our articles you'd like us to explain further, email us at <a href={`mailto:${SITE.email}`}>{SITE.email}</a>. Reader feedback has genuinely improved our process over time, and we welcome it.
+    </p>
+
+    <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border);">
+      <em>Last reviewed: April 2026</em>
+    </p>
+  </div>
+</BaseLayout>

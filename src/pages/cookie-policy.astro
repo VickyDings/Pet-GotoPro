@@ -1,0 +1,89 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../consts.js';
+---
+
+<BaseLayout
+  title="Cookie Policy"
+  description="What cookies Pet-GoToPro uses, why we use them, and how you can control them in your browser."
+>
+  <section class="category-hero">
+    <div class="container-narrow">
+      <div class="breadcrumbs">
+        <a href="/">Home</a> › <span aria-current="page">Cookie Policy</span>
+      </div>
+      <h1>Cookie Policy</h1>
+      <p class="hero-lede">
+        We use very few cookies. Here's exactly which ones, what they do, and how to control them.
+      </p>
+    </div>
+  </section>
+
+  <div class="page-content prose">
+    <p style="background: var(--bg-warm); border-left: 3px solid var(--cta); padding: 1rem 1.5rem; border-radius: 0 var(--radius) var(--radius) 0;">
+      <strong>The short version:</strong> Pet-GoToPro uses minimal cookies — we don't track you for advertising, we don't build profiles about you, and we don't share cookie data with ad networks. The only cookies that may be set come from affiliate link clicks and optional third-party embeds like YouTube.
+    </p>
+
+    <p style="color: var(--text-muted); font-size: 0.9rem;">
+      <em>Last updated: April 2026</em>
+    </p>
+
+    <h2>What cookies are</h2>
+    <p>
+      Cookies are small text files that websites store on your computer or phone. They serve many legitimate purposes — remembering that you're logged in between pages, saving items in a shopping cart, remembering your language preference — but they can also be used to track you across different websites for advertising purposes. Privacy laws like the GDPR and CCPA require websites to disclose what cookies they use and give you meaningful control over them.
+    </p>
+
+    <h2>What cookies Pet-GoToPro uses</h2>
+    <p>
+      Our site itself uses almost no cookies. The third-party services we rely on may set some cookies under specific circumstances, all of which are described below. We deliberately avoid advertising cookies, tracking cookies, and cookies that build profiles about individual visitors.
+    </p>
+
+    <h3>Analytics cookies</h3>
+    <p>
+      We use Cloudflare Web Analytics, which is designed to be privacy-friendly. It <strong>does not set any cookies</strong> and <strong>does not track you across other websites</strong>. Instead, it counts visits anonymously using techniques that don't require cookies at all. This is why you won't see "analytics cookies" listed in the table below — we genuinely don't use any.
+    </p>
+
+    <h3>Affiliate link cookies</h3>
+    <p>
+      When you click an affiliate link on our site and arrive at a retailer like Amazon, that retailer may set a cookie in your browser to remember that you came from us. This is how affiliate commission attribution works across the entire web. We don't set these cookies ourselves; they're set by the retailer. The cookies typically expire after 24 hours (Amazon) or 30 to 90 days (other retailers). These cookies don't share any of your personal information with us — we receive only aggregate commission reports long after your purchase.
+    </p>
+
+    <h3>Embedded content cookies</h3>
+    <p>
+      Occasionally we embed content from third parties, such as YouTube videos or Twitter posts, to illustrate a point in an article. When you view a page containing such an embed, the third-party service may set its own cookies. To minimize this, we use privacy-enhanced embed modes where available (for YouTube, we use the youtube-nocookie.com domain, which delays cookie-setting until you actually click play on the video).
+    </p>
+
+    <h3>Functional cookies</h3>
+    <p>
+      If we ever add functionality that requires remembering your preferences between visits (for instance, a light/dark theme toggle, or remembering that you dismissed a notification bar), we might set a strictly necessary cookie to make that work. Such cookies would never contain personal information and would always be clearly purpose-limited. As of this writing, no such cookies exist on the site.
+    </p>
+
+    <h2>How to control cookies</h2>
+    <p>
+      You have complete control over cookies through your browser settings. Every modern browser lets you view, delete, and block cookies, either all of them or selectively from specific websites. How to do this varies by browser, but you can typically find these controls under "Privacy," "Security," or "Site Settings" in your browser's preferences. If you want step-by-step guidance, search the help documentation for your specific browser.
+    </p>
+    <p>
+      If you block all cookies, most of Pet-GoToPro will still work normally since we use so few of them. The main thing that may break is affiliate commission attribution — if you block cookies from retailers like Amazon, we won't get credit when you make a purchase after clicking one of our links. This doesn't affect you as a user, but it means that if you want to support our site, you'll want to allow cookies for the affiliate retailers, at least during the purchase.
+    </p>
+
+    <h2>Do Not Track signals</h2>
+    <p>
+      Some browsers send a "Do Not Track" (DNT) signal or a newer "Global Privacy Control" (GPC) signal. We respect these signals. If your browser sends a GPC signal, we treat it as an automatic opt-out request under the California Consumer Privacy Act — even though we don't sell personal information in the meaningful sense of that term, we honor the signal as a matter of policy.
+    </p>
+
+    <h2>Third-party services and their policies</h2>
+    <p>
+      Each third-party service we use has its own cookie and privacy practices, which we can't fully control. For full details on how they handle cookies, please consult their respective policies: <a href="https://www.cloudflare.com/privacypolicy/" rel="noopener">Cloudflare</a>, <a href="https://www.amazon.com/gp/help/customer/display.html?nodeId=468496" rel="noopener">Amazon</a>, and <a href="https://policies.google.com/privacy" rel="noopener">Google</a> (for YouTube embeds).
+    </p>
+
+    <h2>Changes to this policy</h2>
+    <p>
+      We'll update this cookie policy if we change which cookies we use or which third-party services we integrate with. The "Last updated" date at the top of this page always reflects the most recent revision.
+    </p>
+
+    <h2>Questions</h2>
+    <p>
+      If you have questions about cookies on our site or want more information about a specific service we use, email us at <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.
+    </p>
+  </div>
+</BaseLayout>

@@ -1,0 +1,174 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { SITE, PET_CATEGORIES, DISCLOSURE } from '../../../consts.js';
+import { getCollection, getEntry } from 'astro:content';
+
+export async function getStaticPaths() {
+  const guides = await getCollection('guides', ({ data }) => !data.draft);
+  return guides.map((post) => ({
+    params: { pet: post.data.pet, slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+
+const category = PET_CATEGORIES.find((c) => c.slug === post.data.pet);
+
+let author = null;
+try {
+  author = await getEntry('authors', post.data.author);
+} catch (e) {
+  // No author file yet, show generic byline
+}
+
+// Related guides from same pet
+const allGuides = await getCollection('guides', ({ data }) => !data.draft);
+const related = allGuides
+  .filter((g) => g.data.pet === post.data.pet && g.slug !== post.slug)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3);
+
+const formatDate = (date) =>
+  new Date(date).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+
+const heroSrc =
+  typeof post.data.heroImage === 'string' ? post.data.heroImage : post.data.heroImage.src;
+
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: post.data.title,
+  description: post.data.description,
+  image: new URL(heroSrc, Astro.site).toString(),
+  datePublished: post.data.pubDate.toISOString(),
+  dateModified: (post.data.updatedDate || post.data.pubDate).toISOString(),
+  author: {
+    '@type': author ? 'Person' : 'Organization',
+    name: author?.data.name || SITE.name,
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: SITE.name,
+    logo: {
+      '@type': 'ImageObject',
+      url: new URL('/pet-gotopro-logo.png', Astro.site).toString(),
+    },
+  },
+};
+---
+
+<BaseLayout
+  title={post.data.title}
+  description={post.data.description}
+  image={heroSrc}
+  articleType="article"
+>
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(articleSchema)} />
+
+  <article>
+    <div class="container-narrow" style="padding: 2rem 1rem 0;">
+      <div class="breadcrumbs">
+        <a href="/">Home</a> › <a href="/guides/">Guides</a> ›
+        <a href={`/guides/${post.data.pet}/`}>{category?.name || post.data.pet}</a> ›
+        <span aria-current="page">{post.data.title}</span>
+      </div>
+
+      <div style="font-size: 0.85rem; color: var(--primary); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.75rem;">
+        {category?.name} · Guide
+      </div>
+
+      <h1 style="margin-bottom: 1rem;">{post.data.title}</h1>
+
+      <p style="font-family: var(--font-display); font-style: italic; font-size: 1.2rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.5rem;">
+        {post.data.description}
+      </p>
+
+      <div class="article-meta">
+        {author && (
+          <span><strong>By:</strong> <a href={`/authors/${author.slug}/`}>{author.data.name}</a></span>
+        )}
+        {post.data.vetReviewer && (
+          <span><strong>Medically reviewed by:</strong> {post.data.vetReviewer}</span>
+        )}
+        <span><strong>Published:</strong> {formatDate(post.data.pubDate)}</span>
+        {post.data.updatedDate && (
+          <span><strong>Updated:</strong> {formatDate(post.data.updatedDate)}</span>
+        )}
+        {post.data.readingTime && (
+          <span><strong>Reading time:</strong> {post.data.readingTime} min</span>
+        )}
+      </div>
+    </div>
+
+    <div class="container-narrow" style="padding: 1rem;">
+      <img
+        src={heroSrc}
+        alt={post.data.heroImageAlt}
+        style="width: 100%; border-radius: var(--radius-lg);"
+        loading="eager"
+      />
+    </div>
+
+    <div class="page-content prose">
+      <Content />
+    </div>
+
+    {author && (
+      <div class="container-narrow" style="padding: 2rem 1rem;">
+        <div style="background: var(--bg-alt); border-radius: var(--radius-lg); padding: 2rem; display: flex; gap: 1.5rem; align-items: flex-start; flex-wrap: wrap;">
+          {author.data.photo && (
+            <img
+              src={typeof author.data.photo === 'string' ? author.data.photo : author.data.photo.src}
+              alt={author.data.name}
+              width="80"
+              height="80"
+              style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;"
+            />
+          )}
+          <div style="flex: 1; min-width: 200px;">
+            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.25rem;">Written by</div>
+            <h3 style="margin: 0 0 0.25rem; font-size: 1.25rem;">
+              <a href={`/authors/${author.slug}/`} style="color: var(--ink); text-decoration: none;">{author.data.name}</a>
+            </h3>
+            <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">{author.data.role}</div>
+            <p style="font-size: 0.95rem; line-height: 1.6; margin: 0;">{author.data.shortBio}</p>
+          </div>
+        </div>
+      </div>
+    )}
+  </article>
+
+  {related.length > 0 && (
+    <section style="background: var(--bg-alt); padding: 4rem 1rem; margin-top: 4rem;">
+      <div class="container">
+        <h2 style="margin-top: 0; margin-bottom: 2rem;">More {category?.name} Guides</h2>
+        <div class="card-grid">
+          {related.map((r) => (
+            <article class="post-card">
+              <a href={`/guides/${r.data.pet}/${r.slug}/`}>
+                <div class="post-card-image">
+                  <img
+                    src={typeof r.data.heroImage === 'string' ? r.data.heroImage : r.data.heroImage.src}
+                    alt={r.data.heroImageAlt}
+                    loading="lazy"
+                  />
+                </div>
+                <div class="post-card-body">
+                  <div class="post-card-category">{category?.name}</div>
+                  <h3 class="post-card-title">{r.data.title}</h3>
+                  <p class="post-card-excerpt">{r.data.description}</p>
+                </div>
+              </a>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+</BaseLayout>

@@ -1,0 +1,86 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../consts.js';
+---
+
+<BaseLayout
+  title="Affiliate Disclosure"
+  description="Pet-GoToPro's full affiliate disclosure — how we use affiliate links, which programs we participate in, and our commitment to honest, reader-first recommendations."
+>
+  <section class="category-hero">
+    <div class="container-narrow">
+      <div class="breadcrumbs">
+        <a href="/">Home</a> › <span aria-current="page">Affiliate Disclosure</span>
+      </div>
+      <h1>Affiliate Disclosure</h1>
+      <p class="hero-lede">
+        Complete transparency about how Pet-GoToPro makes money and why that matters for you as a reader.
+      </p>
+    </div>
+  </section>
+
+  <div class="page-content prose">
+    <p style="background: var(--bg-warm); border-left: 3px solid var(--cta); padding: 1rem 1.5rem; border-radius: 0 var(--radius) var(--radius) 0; font-style: italic;">
+      <strong>The short version:</strong> As an Amazon Associate I earn from qualifying purchases. Pet-GoToPro.com also participates in other affiliate programs. When you click a product link on our site and make a purchase, we may earn a small commission at no additional cost to you. We never accept payment in exchange for positive reviews.
+    </p>
+
+    <h2>Who we are and how we're funded</h2>
+    <p>
+      Pet-GoToPro.com ("Pet-GoToPro," "we," "us," "our") is an independent pet product review and care guide publication. Creating in-depth product testing and well-researched care content takes real time and real money — we buy the products we test at retail, we pay the writers and editors who produce our content, and we host and maintain this website. Rather than charging readers a subscription fee or blanketing the site with display advertising, we've chosen to fund our work primarily through affiliate partnerships.
+    </p>
+
+    <h2>What affiliate links are, in plain language</h2>
+    <p>
+      An affiliate link is a specially-formatted web address that includes a tracking identifier unique to us. When you click one of our affiliate links and then make a purchase from the destination site, that site pays us a small commission — typically anywhere from 1% to 10% of the purchase price, depending on the product category. The price you pay is exactly the same as if you'd gone to the retailer's site directly. You are not charged extra for clicking through us. The commission comes out of the retailer's marketing budget, not your wallet.
+    </p>
+    <p>
+      Affiliate commissions are the primary way Pet-GoToPro sustains itself. Without them, we couldn't afford to buy the products we test, pay our contributors, or keep this site online.
+    </p>
+
+    <h2>Programs we participate in</h2>
+    <p>
+      Our largest affiliate partner is the Amazon Services LLC Associates Program, which is required by its terms to include the following specific statement: <strong>Pet-GoToPro.com is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.com. As an Amazon Associate I earn from qualifying purchases.</strong>
+    </p>
+    <p>
+      Through Amazon's OneLink system, our Amazon links also work for readers shopping on Amazon marketplaces in Canada, France, Germany, Italy, the Netherlands, Poland, Spain, Sweden, and the United Kingdom. When you click an Amazon link from one of those countries, Amazon automatically redirects you to your local marketplace version of the product.
+    </p>
+    <p>
+      We may also participate in affiliate programs with other pet-focused retailers, manufacturers, and services over time. Whenever we add a new affiliate partner, we update this page. We use the same standards for all partners — we only link to products we would genuinely recommend to a friend, regardless of whether or not a commission is involved.
+    </p>
+
+    <h2>How to identify affiliate links on our site</h2>
+    <p>
+      We label affiliate links in several ways. First, every article that contains affiliate links includes a clearly-formatted disclosure box above the first such link, stating in plain English that the article contains affiliate links. Second, the footer of every page on the site includes the required Amazon Associates language. Third, affiliate links in our HTML code carry the <code>rel="sponsored"</code> attribute, which is the standard web convention for identifying paid or affiliate relationships to search engines and assistive technologies.
+    </p>
+    <p>
+      If you prefer not to click affiliate links, you can always search for the product directly on Amazon or any other retailer. Our recommendations don't depend on you using our links — though we appreciate it when you do, because it's what keeps this site running.
+    </p>
+
+    <h2>Our commitment to honest recommendations</h2>
+    <p>
+      Affiliate relationships create an obvious potential conflict of interest — the more we sell, the more we earn — and we take that conflict seriously. These are the rules we hold ourselves to. We never accept payment in exchange for favorable reviews. We never allow brands to pre-approve or edit our content. We never publish sponsored posts disguised as editorial. We always buy the products we test at retail rather than accepting "free review samples" that come with implicit expectations. When a popular product has serious problems, we say so, even if it means forfeiting commission opportunities. When we compare products, we rank them by genuine merit, not by which retailer pays the highest commission.
+    </p>
+    <p>
+      If you ever feel that one of our recommendations doesn't reflect these principles, please email us at <a href={`mailto:${SITE.email}`}>{SITE.email}</a>. We read every message and take concerns about editorial integrity more seriously than almost anything else.
+    </p>
+
+    <h2>Prices and availability</h2>
+    <p>
+      Product prices and availability on affiliate retailers change constantly. The prices we reference in our articles were accurate at the time of publication but may be different by the time you click through. Always check the retailer's current price before purchasing. Every product card on our site includes the disclaimer <em>"Price starts from and is subject to change"</em> for exactly this reason.
+    </p>
+
+    <h2>A note on FTC compliance</h2>
+    <p>
+      The U.S. Federal Trade Commission requires content creators to clearly and conspicuously disclose material connections to the products they endorse, including affiliate relationships. We take this requirement seriously and have designed our disclosures to exceed FTC expectations — you'll find disclosure language in the footer of every page, above the first affiliate link in every monetized article, and on this dedicated page. The goal isn't just to comply with the letter of the law, it's to be genuinely transparent with you about how this site works.
+    </p>
+
+    <h2>Questions</h2>
+    <p>
+      If anything about how we use affiliate links is unclear, or if you have a question about a specific recommendation, please reach out to us at <a href={`mailto:${SITE.email}`}>{SITE.email}</a>. Transparency isn't just a policy for us, it's the foundation of the relationship we're trying to build with our readers.
+    </p>
+
+    <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border);">
+      <em>Last updated: April 2026</em>
+    </p>
+  </div>
+</BaseLayout>

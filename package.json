@@ -1,0 +1,20 @@
+{
+  "name": "pet-gotopro",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Pet-GoToPro — Trusted pet product reviews, guides, and news for dogs, cats, birds, reptiles, aquatics, and small animals.",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "astro": "^5.0.0",
+    "@astrojs/sitemap": "^3.2.0",
+    "@astrojs/rss": "^4.0.0",
+    "@astrojs/mdx": "^4.0.0",
+    "sharp": "^0.33.0"
+  }
+}

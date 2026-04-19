@@ -1,0 +1,72 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE, PET_CATEGORIES } from '../consts.js';
+---
+
+<BaseLayout
+  title="About Pet-GoToPro"
+  description="Pet-GoToPro is an independent pet product review and care guide publisher founded to help pet parents make confident decisions. Learn about our mission, how we work, and who we are."
+>
+  <section class="category-hero">
+    <div class="container-narrow">
+      <div class="breadcrumbs">
+        <a href="/">Home</a> › <span aria-current="page">About</span>
+      </div>
+      <h1>About Pet-GoToPro</h1>
+      <p class="hero-lede">
+        We're here because pet parents deserve honest, practical, research-backed advice — not warmed-over press releases.
+      </p>
+    </div>
+  </section>
+
+  <div class="page-content prose">
+    <h2>Our mission</h2>
+    <p>
+      Pet-GoToPro exists to answer one question well: <em>what does my pet actually need, and which of the thousand products claiming to provide it are worth my money?</em> Every year, pet parents in the United States spend more than $150 billion on their animals, and most of that spending is influenced by ads, algorithms, and sponsored content rather than careful research. We think you deserve better than that, so we built a publication that treats buying decisions the way an investigative magazine would — with testing, comparison, and the willingness to say when a popular product isn't worth its price tag.
+    </p>
+
+    <h2>Who we are</h2>
+    <p>
+      Pet-GoToPro was founded in 2026 as an independent, reader-supported pet product review and care guide publication. We cover six pet categories in depth — {PET_CATEGORIES.map((c, i) => i === PET_CATEGORIES.length - 1 ? `and ${c.name.toLowerCase()}` : `${c.name.toLowerCase()}, `).join('')} — because we believe specialized knowledge beats generic advice every time. A senior cat with renal disease and a baby corn snake have almost nothing in common, and they shouldn't share a single "pet blog" with undifferentiated care recommendations.
+    </p>
+    <p>
+      We're not a venture-backed startup or a division of a larger retailer. We're a small editorial team writing for fellow pet parents, supported by affiliate commissions on products we genuinely recommend.
+    </p>
+
+    <h2>What we cover</h2>
+    <p>
+      Our content falls into three buckets. <strong>Product reviews</strong> are deep comparisons of specific products — "the five best self-cleaning litter boxes," "the best aquarium filters for 20-gallon tanks," and so on — with hands-on testing, spec breakdowns, and clear winners for different budgets and use cases. <strong>Care guides</strong> are evergreen resources on the how-to of pet ownership, from setting up a first bearded dragon enclosure to navigating a senior dog's mobility changes. <strong>News</strong> covers recalls, regulation changes, and industry developments that affect pet parents.
+    </p>
+    <p>
+      Every article is categorized by pet so you can jump straight to what matters for your companion. If you've got a Maine Coon, you shouldn't have to wade through dog-centric content to find a cat tree that actually accommodates a 20-pound cat.
+    </p>
+
+    <h2>How we make money</h2>
+    <p>
+      Pet-GoToPro is reader-supported through affiliate partnerships, primarily with Amazon through the Amazon Associates program. When you click a product link on our site and make a purchase, we may earn a small commission at no additional cost to you. We never accept payment in exchange for positive coverage, never allow brands to pre-approve reviews, and never publish sponsored posts disguised as editorial. When we think a product isn't worth its price, we say so — and you'll often see popular, heavily marketed products left off our recommendation lists for exactly that reason.
+    </p>
+    <p>
+      If you'd like to know more about how we use affiliate links, our <a href="/affiliate-disclosure/">full affiliate disclosure</a> explains every detail.
+    </p>
+
+    <h2>How we test and evaluate products</h2>
+    <p>
+      Honest reviews require honest methodology. We've documented our full evaluation process on our <a href="/how-we-test/">How We Test</a> page, but the short version is that we combine hands-on testing (for products we can realistically use), verified owner review analysis across thousands of purchases, manufacturer spec review, expert input where available, and long-term follow-ups when a product either holds up or fails over time. We buy the products we test at retail — we don't accept free review samples that come with expectations of favorable coverage.
+    </p>
+
+    <h2>Our editorial standards</h2>
+    <p>
+      Our <a href="/editorial-policy/">editorial policy</a> covers fact-checking, sourcing, corrections, and our position on AI-generated content (short version: human writers, human reviewers, human judgment — always). If you ever find an error in one of our articles, please email us at <a href={`mailto:${SITE.email}`}>{SITE.email}</a> and we'll investigate and correct it promptly. Transparency is one of our core values, and that includes being honest about our own mistakes.
+    </p>
+
+    <h2>Pet health disclaimer</h2>
+    <p>
+      Nothing on Pet-GoToPro is veterinary advice. We research thoroughly, cite reputable sources, and consult with veterinary professionals where appropriate, but pet health decisions should always involve a licensed veterinarian who has actually examined your pet. If you're reading one of our articles and thinking "I should call the vet about this," the answer is yes — please do.
+    </p>
+
+    <h2>Get in touch</h2>
+    <p>
+      Whether you have a product you'd like us to consider for review, a topic you wish we'd cover, a correction on existing content, or just want to say hello — we'd love to hear from you. The fastest way to reach us is through our <a href="/contact/">contact page</a> or directly at <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.
+    </p>
+  </div>
+</BaseLayout>

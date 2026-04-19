@@ -1,0 +1,62 @@
+# ============================================================
+# ROBOTS.TXT — Instructions for search engine crawlers
+# ============================================================
+# This file tells search engine bots (Googlebot, Bingbot, etc.)
+# which parts of your site they should crawl and which parts
+# they should skip. It's the first file most search engines
+# request when they arrive at a new domain.
+# ============================================================
+
+# Allow all well-behaved crawlers to access all public pages
+User-agent: *
+Allow: /
+
+# Block the admin panel from search engines — visitors don't
+# need to find your login screen through Google.
+Disallow: /admin/
+
+# Block the affiliate redirect path — search engines don't
+# need to follow every /out/ link, and following them creates
+# unnecessary traffic on affiliate retailer sites.
+Disallow: /out/
+
+# Block any internal search results pages (if you add search later)
+Disallow: /search
+
+# ============================================================
+# BLOCK AI TRAINING CRAWLERS
+# ============================================================
+# These crawlers scrape websites to train large language
+# models. Blocking them does not affect Google Search or AI
+# search results — Googlebot is separate from Google-Extended
+# (which trains Gemini). You can choose to allow them later
+# if you decide the exposure is worth it.
+# ============================================================
+
+User-agent: GPTBot
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: PerplexityBot
+Disallow: /
+
+# ============================================================
+# SITEMAP — Help search engines find all your pages
+# ============================================================
+# This tells crawlers where to find the XML sitemap, which
+# lists every page on the site. Astro generates this
+# automatically based on your content.
+# ============================================================
+
+Sitemap: https://pet-gotopro.com/sitemap-index.xml

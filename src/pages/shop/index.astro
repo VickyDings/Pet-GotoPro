@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { PET_CATEGORIES } from '../../consts.js';
+
+const title = 'Shop by Pet';
+const description =
+  'Find the right gear for your pet, organized by species. Pick your companion and browse our curated picks across food, habitat, health, enrichment, and training.';
+---
+
+<BaseLayout title={title} description={description}>
+  <section class="category-hero">
+    <div class="container">
+      <div class="breadcrumbs">
+        <a href="/">Home</a> › <span aria-current="page">Shop by Pet</span>
+      </div>
+      <h1>Shop by Pet</h1>
+      <p class="hero-lede">{description}</p>
+    </div>
+  </section>
+
+  <section class="container" style="padding: 3rem 1rem 5rem;">
+    <div class="category-grid">
+      {PET_CATEGORIES.map((cat) => (
+        <a href={`/shop/${cat.slug}/`} class="category-card">
+          <div class="category-icon" style={`color: ${cat.color};`}>{cat.icon}</div>
+          <h3>{cat.name}</h3>
+          <p>{cat.description}</p>
+          <div style="font-size: 0.85rem; color: var(--primary); font-weight: 600; margin-top: auto;">
+            Browse {cat.name.toLowerCase()} picks →
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

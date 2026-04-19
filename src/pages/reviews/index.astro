@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { SITE, PET_CATEGORIES } from '../../consts.js';
+import { getCollection } from 'astro:content';
+
+// Count reviews in each category so we can show "12 reviews" badges
+const allReviews = await getCollection('reviews', ({ data }) => !data.draft);
+const countByPet = Object.fromEntries(
+  PET_CATEGORIES.map((cat) => [
+    cat.slug,
+    allReviews.filter((r) => r.data.pet === cat.slug).length,
+  ])
+);
+
+const title = 'Product Reviews';
+const description =
+  'In-depth, hands-on reviews of the best products for every kind of pet — from self-cleaning litter boxes to aquarium filters. Honest picks, tested criteria, no pay-to-play.';
+---
+
+<BaseLayout title={title} description={description}>
+  <section class="category-hero">
+    <div class="container">
+      <div class="breadcrumbs">
+        <a href="/">Home</a> › <span aria-current="page">Product Reviews</span>
+      </div>
+      <h1>Product Reviews</h1>
+      <p class="hero-lede">{description}</p>
+    </div>
+  </section>
+
+  <section class="container" style="padding: 3rem 1rem 5rem;">
+    <div class="category-grid">
+      {PET_CATEGORIES.map((cat) => {
+        const count = countByPet[cat.slug] || 0;
+        return (
+          <a href={`/reviews/${cat.slug}/`} class="category-card">
+            <div class="category-icon" style={`color: ${cat.color};`}>{cat.icon}</div>
+            <h3>{cat.name}</h3>
+            <p>{cat.description}</p>
+            <div style="font-size: 0.85rem; color: var(--primary); font-weight: 600; margin-top: auto;">
+              {count} {count === 1 ? 'review' : 'reviews'} →
+            </div>
+          </a>
+        );
+      })}
+    </div>
+  </section>
+</BaseLayout>

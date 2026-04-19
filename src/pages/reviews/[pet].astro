@@ -1,0 +1,90 @@
+---
+// ============================================================
+// DYNAMIC CATEGORY PAGE — /reviews/[pet]/
+// ============================================================
+// The square brackets in the filename ([pet].astro) tell Astro
+// that this file should generate MULTIPLE pages, one for each
+// value of the "pet" parameter. The getStaticPaths function
+// below tells Astro which pages to create.
+//
+// Without this, we'd need six separate files — one for dogs,
+// one for cats, one for birds, etc. With it, we write the logic
+// once and Astro creates all six pages automatically.
+// ============================================================
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { PET_CATEGORIES } from '../../consts.js';
+import { getCollection } from 'astro:content';
+
+// getStaticPaths tells Astro to generate one page per pet category
+export async function getStaticPaths() {
+  return PET_CATEGORIES.map((cat) => ({
+    params: { pet: cat.slug },
+    props: { category: cat },
+  }));
+}
+
+const { category } = Astro.props;
+
+// Get all reviews for this specific pet, sorted newest first
+const allReviews = await getCollection('reviews', ({ data }) => !data.draft);
+const reviews = allReviews
+  .filter((r) => r.data.pet === category.slug)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const title = `${category.name} Product Reviews`;
+const description = `Expert reviews of the best ${category.name.toLowerCase()} products — ${category.description}`;
+---
+
+<BaseLayout title={title} description={description}>
+  <section class="category-hero">
+    <div class="container">
+      <div class="breadcrumbs">
+        <a href="/">Home</a> › <a href="/reviews/">Reviews</a> › <span aria-current="page">{category.name}</span>
+      </div>
+      <div style="font-size: 4rem; margin-bottom: 1rem;">{category.icon}</div>
+      <h1>{title}</h1>
+      <p class="hero-lede">{category.description}</p>
+    </div>
+  </section>
+
+  <section class="container" style="padding: 3rem 1rem 5rem;">
+    {reviews.length === 0 ? (
+      <div style="text-align: center; padding: 4rem 1rem; color: var(--text-muted);">
+        <p style="font-size: 1.1rem;">New {category.name.toLowerCase()} reviews are coming soon.</p>
+        <p style="margin-top: 1rem;">
+          In the meantime, <a href="/reviews/">browse reviews for other pets</a> or
+          <a href={`/guides/${category.slug}/`}>read our {category.name.toLowerCase()} care guides</a>.
+        </p>
+      </div>
+    ) : (
+      <div class="card-grid">
+        {reviews.map((post) => (
+          <article class="post-card">
+            <a href={`/reviews/${post.data.pet}/${post.slug}/`}>
+              <div class="post-card-image">
+                <img
+                  src={typeof post.data.heroImage === 'string' ? post.data.heroImage : post.data.heroImage.src}
+                  alt={post.data.heroImageAlt}
+                  loading="lazy"
+                />
+              </div>
+              <div class="post-card-body">
+                <div class="post-card-category">{category.name}</div>
+                <h3 class="post-card-title">{post.data.title}</h3>
+                <p class="post-card-excerpt">{post.data.description}</p>
+                <div class="post-card-meta">
+                  {new Date(post.data.pubDate).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                </div>
+              </div>
+            </a>
+          </article>
+        ))}
+      </div>
+    )}
+  </section>
+</BaseLayout>

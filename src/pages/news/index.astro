@@ -1,0 +1,61 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const allNews = await getCollection('news', ({ data }) => !data.draft);
+const news = allNews.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const title = 'Pet News';
+const description =
+  'Recalls, industry news, new product launches, and updates that affect pet owners — curated from trusted sources.';
+---
+
+<BaseLayout title={title} description={description}>
+  <section class="category-hero">
+    <div class="container">
+      <div class="breadcrumbs">
+        <a href="/">Home</a> › <span aria-current="page">News</span>
+      </div>
+      <h1>Pet News</h1>
+      <p class="hero-lede">{description}</p>
+    </div>
+  </section>
+
+  <section class="container" style="padding: 3rem 1rem 5rem;">
+    {news.length === 0 ? (
+      <div style="text-align: center; padding: 4rem 1rem; color: var(--text-muted);">
+        <p style="font-size: 1.1rem;">News updates coming soon. Check back shortly.</p>
+      </div>
+    ) : (
+      <div class="card-grid">
+        {news.map((post) => (
+          <article class="post-card">
+            <a href={`/news/${post.slug}/`}>
+              <div class="post-card-image">
+                <img
+                  src={typeof post.data.heroImage === 'string' ? post.data.heroImage : post.data.heroImage.src}
+                  alt={post.data.heroImageAlt}
+                  loading="lazy"
+                />
+              </div>
+              <div class="post-card-body">
+                <div class="post-card-category" style={post.data.urgency === 'breaking' ? 'color: var(--error);' : post.data.urgency === 'alert' ? 'color: var(--warning);' : ''}>
+                  {post.data.urgency === 'breaking' ? 'Breaking' : post.data.urgency === 'alert' ? 'Alert' : 'News'}
+                </div>
+                <h3 class="post-card-title">{post.data.title}</h3>
+                <p class="post-card-excerpt">{post.data.description}</p>
+                <div class="post-card-meta">
+                  {new Date(post.data.pubDate).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                </div>
+              </div>
+            </a>
+          </article>
+        ))}
+      </div>
+    )}
+  </section>
+</BaseLayout>

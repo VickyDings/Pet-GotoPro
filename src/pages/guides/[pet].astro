@@ -1,0 +1,75 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { PET_CATEGORIES } from '../../consts.js';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  return PET_CATEGORIES.map((cat) => ({
+    params: { pet: cat.slug },
+    props: { category: cat },
+  }));
+}
+
+const { category } = Astro.props;
+
+const allGuides = await getCollection('guides', ({ data }) => !data.draft);
+const guides = allGuides
+  .filter((g) => g.data.pet === category.slug)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const title = `${category.name} Care Guides`;
+const description = `Complete care guides for ${category.name.toLowerCase()} — ${category.description}`;
+---
+
+<BaseLayout title={title} description={description}>
+  <section class="category-hero">
+    <div class="container">
+      <div class="breadcrumbs">
+        <a href="/">Home</a> › <a href="/guides/">Guides</a> › <span aria-current="page">{category.name}</span>
+      </div>
+      <div style="font-size: 4rem; margin-bottom: 1rem;">{category.icon}</div>
+      <h1>{title}</h1>
+      <p class="hero-lede">{category.description}</p>
+    </div>
+  </section>
+
+  <section class="container" style="padding: 3rem 1rem 5rem;">
+    {guides.length === 0 ? (
+      <div style="text-align: center; padding: 4rem 1rem; color: var(--text-muted);">
+        <p style="font-size: 1.1rem;">New {category.name.toLowerCase()} guides are coming soon.</p>
+        <p style="margin-top: 1rem;">
+          In the meantime, <a href="/guides/">browse guides for other pets</a> or
+          <a href={`/reviews/${category.slug}/`}>check out our {category.name.toLowerCase()} product reviews</a>.
+        </p>
+      </div>
+    ) : (
+      <div class="card-grid">
+        {guides.map((post) => (
+          <article class="post-card">
+            <a href={`/guides/${post.data.pet}/${post.slug}/`}>
+              <div class="post-card-image">
+                <img
+                  src={typeof post.data.heroImage === 'string' ? post.data.heroImage : post.data.heroImage.src}
+                  alt={post.data.heroImageAlt}
+                  loading="lazy"
+                />
+              </div>
+              <div class="post-card-body">
+                <div class="post-card-category">{category.name}</div>
+                <h3 class="post-card-title">{post.data.title}</h3>
+                <p class="post-card-excerpt">{post.data.description}</p>
+                <div class="post-card-meta">
+                  {new Date(post.data.pubDate).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                </div>
+              </div>
+            </a>
+          </article>
+        ))}
+      </div>
+    )}
+  </section>
+</BaseLayout>
