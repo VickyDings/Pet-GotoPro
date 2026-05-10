@@ -1,0 +1,92 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../consts.js';
+---
+
+<BaseLayout
+  title="Image Credits & Attribution"
+  description="Pet-GoToPro takes image attribution seriously. This page documents the sources of breed-reference photography and other licensed imagery used across our articles."
+>
+  <section class="category-hero">
+    <div class="container-narrow">
+      <div class="breadcrumbs">
+        <a href="/">Home</a> › <span aria-current="page">Image Credits</span>
+      </div>
+      <h1>Image Credits & Attribution</h1>
+      <p class="hero-lede">
+        Where our images come from, who created them, and how we honor the licenses that make our editorial work possible.
+      </p>
+    </div>
+  </section>
+
+  <div class="page-content prose">
+    <p style="background: var(--bg-warm); border-left: 3px solid var(--cta); padding: 1rem 1.5rem; border-radius: 0 var(--radius) var(--radius) 0;">
+      <strong>The short version:</strong> Pet-GoToPro uses a mix of original photography, licensed stock imagery, and openly licensed research datasets to illustrate our articles. When an image requires attribution under its license, we credit it both at the point of use and on this page. We take licensing seriously because the photographers and researchers who produce this work deserve credit, and because it's the right way to operate.
+    </p>
+
+    <p style="color: var(--text-muted); font-size: 0.9rem;">
+      <em>Last updated: April 2026</em>
+    </p>
+
+    <h2>Why this page exists</h2>
+    <p>
+      Most websites bury image credits or skip them entirely. We chose to do this differently for two reasons. First, the licenses that make excellent imagery freely available to small publishers like us depend on attribution being honored — when sites strip credits, the entire ecosystem of openly licensed research and photography weakens. Second, transparency about our sources is part of the same editorial integrity we apply to product reviews and care guides. If we tell you we tested a product honestly, we should also tell you honestly where our pictures came from.
+    </p>
+
+    <h2>Oxford-IIIT Pet Dataset</h2>
+    <p>
+      Many of the breed-specific images on Pet-GoToPro come from the Oxford-IIIT Pet Dataset, a research dataset created by Omkar M. Parkhi, Andrea Vedaldi, Andrew Zisserman, and C. V. Jawahar in 2012. The dataset is published by the Visual Geometry Group at the University of Oxford in collaboration with the Indian Institute of Information Technology, Hyderabad. It contains thousands of high-quality photographs covering 37 cat and dog breeds, originally collected for computer vision research into automatic breed recognition.
+    </p>
+    <p>
+      We use this dataset because it's one of the few openly licensed image collections that provides consistent, breed-accurate reference photography for popular companion animal breeds. When we write a guide about Maine Coons, we want to show you actual Maine Coons rather than a generic long-haired cat that might or might not represent the breed accurately. The Oxford dataset's research-grade breed labeling makes that possible.
+    </p>
+
+    <h3>License terms</h3>
+    <p>
+      The Oxford-IIIT Pet Dataset is published under the <a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="noopener" target="_blank">Creative Commons Attribution-ShareAlike 4.0 International License (CC BY-SA 4.0)</a>. This license permits commercial use, redistribution, and modification, provided that the original creators are credited, the license is identified, and any modifications are noted.
+    </p>
+    <p>
+      When we use Oxford-IIIT Pet Dataset imagery on Pet-GoToPro, we honor these requirements by including a visible caption near the image identifying the source and license, by linking to the full license terms here on this page, and by treating the imagery itself as remaining under its original CC BY-SA 4.0 license. Pet-GoToPro's own written editorial content, site design, and other original materials remain under our standard editorial copyright.
+    </p>
+
+    <h3>Citation</h3>
+    <p>
+      To cite the Oxford-IIIT Pet Dataset in academic work or in your own publications, please use the following reference, which is the citation format the dataset's creators have requested:
+    </p>
+    <p style="background: var(--bg-alt); padding: 1.25rem 1.5rem; border-radius: var(--radius); font-size: 0.95rem; line-height: 1.7;">
+      Parkhi, O. M., Vedaldi, A., Zisserman, A., & Jawahar, C. V. (2012). Cats and Dogs. In <em>IEEE Conference on Computer Vision and Pattern Recognition</em>.
+    </p>
+    <p>
+      The dataset itself can be accessed at the <a href="https://www.robots.ox.ac.uk/~vgg/data/pets/" rel="noopener" target="_blank">Visual Geometry Group's Oxford-IIIT Pet Dataset page</a>, where the original images, annotations, and related research papers are freely available for download.
+    </p>
+
+    <h3>How we use the dataset</h3>
+    <p>
+      We use Oxford-IIIT Pet Dataset images primarily within our breed-specific care guides — articles dedicated to a single cat or dog breed. Each article that uses these images carries a caption near the image identifying the source, and a footer note linking back to this credits page for full attribution detail. We do not use the dataset in our hero photography, our department category tiles, or our product review imagery. Those uses are filled by separately licensed stock photography and original photography.
+    </p>
+
+    <h2>Stock photography</h2>
+    <p>
+      For lifestyle photography, hero imagery, and category illustration, Pet-GoToPro uses photography sourced from openly licensed stock photography services including <a href="https://unsplash.com" rel="noopener" target="_blank">Unsplash</a>, <a href="https://www.pexels.com" rel="noopener" target="_blank">Pexels</a>, and <a href="https://burst.shopify.com" rel="noopener" target="_blank">Burst by Shopify</a>. These services license their photography under terms that permit commercial use without requiring per-image attribution, though we do credit individual photographers where their license requests it. We're grateful to the many photographers who contribute to these services and make high-quality imagery available to small independent publishers.
+    </p>
+
+    <h2>Manufacturer and product imagery</h2>
+    <p>
+      Product photographs that appear in our review articles are typically sourced from the manufacturer or retailer of the product being reviewed, used for editorial purposes consistent with fair use and standard publishing practice. Where a product photograph is licensed under specific terms, we attribute accordingly.
+    </p>
+
+    <h2>Original photography</h2>
+    <p>
+      A growing portion of the images on Pet-GoToPro are original photographs taken by our editorial team during product testing and care research. These images are unmarked because attribution to ourselves on our own site would be redundant, but they are protected under our standard editorial copyright and may not be reproduced elsewhere without permission.
+    </p>
+
+    <h2>Reporting an image issue</h2>
+    <p>
+      If you believe an image on Pet-GoToPro is being used without proper attribution, in violation of its license, or in any other way that requires correction, please email us immediately at <a href={`mailto:${SITE.email}`}>{SITE.email}</a>. We investigate every image rights concern within two business days and remove or properly attribute imagery as needed. Our goal is to honor the work of every photographer and researcher whose images appear on this site.
+    </p>
+
+    <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border);">
+      <em>This credits page was last updated in April 2026 and is reviewed quarterly to ensure all attributions remain current and accurate.</em>
+    </p>
+  </div>
+</BaseLayout>
