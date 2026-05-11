@@ -1,25 +1,22 @@
 ---
 // ============================================================
-// HOMEPAGE
+// HOMEPAGE — REDESIGNED v2
 // ============================================================
-// This is what visitors see when they go to pet-gotopro.com.
-// Its job is to do three things in the first screen:
-//   1. Tell visitors what this site IS (hero)
-//   2. Show what pet categories are covered (category grid)
-//   3. Surface the latest/featured content (recent posts)
+// Hybrid Petco × Chewy design. Hero with warm headline,
+// department tile grid using the seven-color palette,
+// featured review banner, latest reviews grid, and a
+// navy-block trust section to close.
 // ============================================================
 
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE, PET_CATEGORIES } from '../consts.js';
 import { getCollection } from 'astro:content';
 
-// Fetch the most recent reviews (top 6) that aren't drafts
 const allReviews = await getCollection('reviews', ({ data }) => !data.draft);
 const recentReviews = allReviews
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
   .slice(0, 6);
 
-// Fetch the most recent guides (top 3)
 const allGuides = await getCollection('guides', ({ data }) => !data.draft);
 const recentGuides = allGuides
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
@@ -30,57 +27,108 @@ const recentGuides = allGuides
   title={SITE.name}
   description={SITE.description}
 >
-  <!-- HERO -->
+  <!-- ============================================================
+       HERO
+       ============================================================ -->
   <section class="hero">
-    <div class="container-narrow">
-      <div style="margin-bottom: 1.5rem;">
+    <div class="container-narrow" style="text-align: center;">
+      <div style="margin-bottom: 24px;">
         <img
           src="/pet-gotopro-logo.png"
           alt=""
-          width="120"
-          height="120"
-          style="border-radius: 20px; margin: 0 auto; display: block;"
+          width="100"
+          height="100"
+          style="border-radius: 20px; margin: 0 auto; display: block; box-shadow: var(--shadow-md);"
         />
       </div>
-      <h1>Trusted pet advice, tested gear, real pet parents.</h1>
+
+      <div style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; background: white; border: 1px solid var(--border-subtle); border-radius: var(--radius-pill); font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--brand-primary); margin-bottom: 20px;">
+        <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--commerce); display: inline-block;"></span>
+        New for 2026
+      </div>
+
+      <h1 style="margin-bottom: 16px;">Trusted pet advice, <em style="font-style: italic; font-weight: 500; color: var(--brand-primary);">tested gear</em>, real pet parents.</h1>
+
       <p class="hero-lede">
         Honest product reviews and care guides for dogs, cats, birds, reptiles, aquatics, and small animals — so you can spend less time researching and more time with your pet.
       </p>
-      <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-        <a href="/reviews/" class="btn btn-primary">Browse Reviews</a>
-        <a href="/guides/" class="btn btn-secondary">Read Guides</a>
+
+      <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 8px;">
+        <a href="/reviews/" class="btn btn-primary">Browse Reviews →</a>
+        <a href="/guides/" class="btn btn-ghost">Read the Guides</a>
       </div>
     </div>
   </section>
 
-  <!-- CATEGORY GRID -->
-  <section class="container" style="padding: 4rem 1rem;">
-    <div style="text-align: center; margin-bottom: 3rem;">
-      <h2 style="margin-top: 0;">Find your pet</h2>
-      <p style="color: var(--text-muted); max-width: 560px; margin: 1rem auto 0;">
+  <!-- ============================================================
+       DEPARTMENT TILES — Shop by Pet
+       ============================================================ -->
+  <section class="container" style="padding: 32px 16px 48px;">
+    <div style="text-align: center; margin-bottom: 32px;">
+      <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--commerce); margin-bottom: 8px;">Shop by Pet</div>
+      <h2 style="margin-top: 0;">Find your companion</h2>
+      <p style="color: var(--text-secondary); max-width: 560px; margin: 12px auto 0; font-size: 15px;">
         Every pet is different, so every guide is species-specific. Pick your companion to jump to reviews and care resources tailored to them.
       </p>
     </div>
 
     <div class="category-grid">
       {PET_CATEGORIES.map((cat) => (
-        <a href={`/reviews/${cat.slug}/`} class="category-card">
-          <div class="category-icon" style={`color: ${cat.color};`}>{cat.icon}</div>
+        <a
+          href={`/reviews/${cat.slug}/`}
+          class="category-card"
+          style={`--tile-bg: ${cat.colorTint};`}
+        >
+          <div class="category-icon">{cat.icon}</div>
           <h3>{cat.name}</h3>
-          <p>{cat.description}</p>
+          <div style={`font-size: 11px; font-weight: 600; color: ${cat.colorText}; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 4px;`}>
+            View reviews →
+          </div>
         </a>
       ))}
     </div>
   </section>
 
-  <!-- RECENT REVIEWS -->
+  <!-- ============================================================
+       FEATURED REVIEW BANNER (navy block with coral CTA)
+       ============================================================ -->
   {recentReviews.length > 0 && (
-    <section style="background: var(--bg-alt); padding: 4rem 1rem;">
+    <section class="container" style="padding: 0 16px 48px;">
+      <div style="background: var(--brand-primary); border-radius: var(--radius-xl); overflow: hidden; color: white; padding: 40px 24px;">
+        <div style="max-width: 640px; margin: 0 auto; text-align: center;">
+          <div style="display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; background: rgba(226, 92, 45, 0.2); border: 1px solid var(--commerce); border-radius: var(--radius-pill); font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--commerce); margin-bottom: 20px;">
+            ⭐ Editor's Pick
+          </div>
+          <h2 style="color: white; margin-top: 0; margin-bottom: 16px; font-size: clamp(1.5rem, 4vw + 0.5rem, 2.25rem);">
+            {recentReviews[0].data.title}
+          </h2>
+          <p style="font-size: 15px; line-height: 1.6; color: rgba(255,255,255,0.85); margin-bottom: 24px;">
+            {recentReviews[0].data.description}
+          </p>
+          <a
+            href={`/reviews/${recentReviews[0].data.pet}/${recentReviews[0].slug}/`}
+            class="btn btn-commerce"
+          >
+            Read the Review →
+          </a>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- ============================================================
+       LATEST REVIEWS
+       ============================================================ -->
+  {recentReviews.length > 0 && (
+    <section style="background: white; padding: 48px 16px;">
       <div class="container">
-        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
-          <h2 style="margin: 0;">Latest Product Reviews</h2>
-          <a href="/reviews/" style="color: var(--primary); font-weight: 600; font-size: 0.95rem;">
-            See all reviews →
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+          <div>
+            <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--commerce); margin-bottom: 6px;">Latest Reviews</div>
+            <h2 style="margin: 0;">Fresh picks, tested this month</h2>
+          </div>
+          <a href="/reviews/" style="color: var(--brand-primary); font-weight: 600; font-size: 14px; text-decoration: none;">
+            All reviews →
           </a>
         </div>
 
@@ -98,7 +146,9 @@ const recentGuides = allGuides
                     />
                   </div>
                   <div class="post-card-body">
-                    <div class="post-card-category">{cat?.name || post.data.pet}</div>
+                    <div class="post-card-category" style={`color: ${cat?.colorText || 'var(--brand-primary)'};`}>
+                      {cat?.name || post.data.pet}
+                    </div>
                     <h3 class="post-card-title">{post.data.title}</h3>
                     <p class="post-card-excerpt">{post.data.description}</p>
                     <div class="post-card-meta">
@@ -118,13 +168,18 @@ const recentGuides = allGuides
     </section>
   )}
 
-  <!-- RECENT GUIDES -->
+  <!-- ============================================================
+       LATEST GUIDES
+       ============================================================ -->
   {recentGuides.length > 0 && (
-    <section class="container" style="padding: 4rem 1rem;">
-      <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
-        <h2 style="margin: 0;">Fresh From the Guides</h2>
-        <a href="/guides/" style="color: var(--primary); font-weight: 600; font-size: 0.95rem;">
-          See all guides →
+    <section class="container" style="padding: 48px 16px;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+        <div>
+          <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--commerce); margin-bottom: 6px;">Fresh From the Guides</div>
+          <h2 style="margin: 0;">Care advice, species by species</h2>
+        </div>
+        <a href="/guides/" style="color: var(--brand-primary); font-weight: 600; font-size: 14px; text-decoration: none;">
+          All guides →
         </a>
       </div>
 
@@ -142,7 +197,9 @@ const recentGuides = allGuides
                   />
                 </div>
                 <div class="post-card-body">
-                  <div class="post-card-category">{cat?.name || post.data.pet}</div>
+                  <div class="post-card-category" style={`color: ${cat?.colorText || 'var(--brand-primary)'};`}>
+                    {cat?.name || post.data.pet}
+                  </div>
                   <h3 class="post-card-title">{post.data.title}</h3>
                   <p class="post-card-excerpt">{post.data.description}</p>
                 </div>
@@ -154,14 +211,20 @@ const recentGuides = allGuides
     </section>
   )}
 
-  <!-- TRUST BLOCK — signals why visitors should trust this site -->
-  <section style="background: var(--primary); color: white; padding: 4rem 1rem;">
-    <div class="container-narrow" style="text-align: center;">
-      <h2 style="color: white; margin-top: 0;">Why Pet-GoToPro?</h2>
-      <p style="font-size: 1.1rem; line-height: 1.7; color: rgba(255,255,255,0.9); max-width: 720px; margin: 1.5rem auto;">
-        Every product we recommend is researched against verified owner reviews, expert testing, and manufacturer specs. We don't accept free products in exchange for positive reviews, and we label every sponsored or affiliate link clearly. When a product doesn't live up to the marketing, we say so.
+  <!-- ============================================================
+       TRUST SECTION (navy block)
+       ============================================================ -->
+  <section style="background: var(--brand-primary); color: white; padding: 56px 16px; position: relative; overflow: hidden;">
+    <div style="position: absolute; top: -200px; right: -200px; width: 600px; height: 600px; border-radius: 50%; background: radial-gradient(circle, rgba(226,92,45,0.15), transparent 70%); pointer-events: none;"></div>
+    <div style="max-width: 920px; margin: 0 auto; text-align: center; position: relative;">
+      <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--commerce); margin-bottom: 14px;">Why Pet-GoToPro</div>
+      <h2 style="color: white; margin-top: 0; font-style: italic; font-weight: 500; margin-bottom: 20px;">
+        We test products in <strong style="font-style: normal; font-weight: 700;">real homes with real pets</strong> — never in marketing labs.
+      </h2>
+      <p style="font-size: 15px; line-height: 1.65; color: rgba(255,255,255,0.85); max-width: 720px; margin: 0 auto 28px;">
+        Every product we recommend is researched against verified owner reviews, expert testing, and manufacturer specs. We don't accept free products in exchange for positive coverage. When a product doesn't live up to the marketing, we say so.
       </p>
-      <a href="/how-we-test/" class="btn" style="background: white; color: var(--primary-dark); margin-top: 1rem;">
+      <a href="/how-we-test/" class="btn btn-commerce">
         How we test →
       </a>
     </div>
