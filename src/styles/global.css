@@ -1,13 +1,7 @@
 // ============================================================
-// SITE CONSTANTS — The Control Panel of Pet-GoToPro
-// ============================================================
-// This file holds settings used throughout the entire site.
-// When you want to change something site-wide — a menu item,
-// a tagline, your contact email — you come HERE and edit it
-// in ONE place, and the change appears everywhere automatically.
-// ============================================================
-
-export const SITE = {
+/* ============================================================
+   PET-GOTOPRO GLOBAL STYLES — REDESIGNED v2
+   ============================================================ */
   name: "Pet-GoToPro",
   fullName: "Pet-Go'to'Pro",
   tagline: "Get trusted information from the Pet Pros",
@@ -163,3 +157,4 @@ export const DISCLOSURE = {
     "This link also works for shoppers in Canada, France, Germany, Italy, the Netherlands, Poland, Spain, Sweden, and the United Kingdom — Amazon OneLink automatically redirects to your local marketplace.",
   priceNote: "*Price starts from and is subject to change",
 };
+body.menu-open { overflow: hidden; }
