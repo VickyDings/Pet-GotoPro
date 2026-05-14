@@ -1,36 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pet-GoToPro Content Admin</title>
-  <meta name="robots" content="noindex, nofollow" />
-  <link rel="icon" type="image/png" href="/favicon.png" />
-</head>
-<body>
-  <!--
-    ============================================================
-    DECAP CMS ADMIN INTERFACE
-    ============================================================
-    This file loads the Decap CMS editing interface. When you
-    visit https://pet-gotopro.com/admin/ you'll see a login
-    screen, then a dashboard where you can create, edit, and
-    publish posts through a friendly web form instead of
-    editing Markdown files directly.
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pet-GoToPro Content Manager</title>
+    <link rel="icon" type="image/png" href="/favicon.png" />
+  </head>
+  <body>
+    <!-- Netlify Identity Widget (for login) -->
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
-    HOW IT WORKS BEHIND THE SCENES:
-    When you publish a post through this interface, Decap
-    commits a new Markdown file to your GitHub repository.
-    Cloudflare Pages detects the new commit and rebuilds your
-    site automatically. About 60 seconds later, your post is
-    live on pet-gotopro.com.
+    <!-- Decap CMS -->
+    <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
 
-    SETUP:
-    The config.yml file next to this one controls what fields
-    appear in the editing forms. See the comments in that
-    file for customization options.
-    ============================================================
-  -->
-  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
-</body>
+    <script>
+      // Redirect to login after successful authentication
+      if (window.netlifyIdentity) {
+        window.netlifyIdentity.on("init", (user) => {
+          if (!user) {
+            window.netlifyIdentity.on("login", () => {
+              document.location.href = "/admin/";
+            });
+          }
+        });
+      }
+    </script>
+  </body>
 </html>
