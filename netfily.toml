@@ -1,0 +1,52 @@
+# ============================================================
+# NETLIFY CONFIGURATION FOR PET-GOTOPRO
+# ============================================================
+# This file tells Netlify how to build the site and how to
+# serve specific files (like the Decap CMS config.yml which
+# needs to be served as text, not a download).
+# ============================================================
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# ============================================================
+# HEADERS — Tell browsers how to handle specific files
+# ============================================================
+
+# Serve admin config.yml as plain text (not as a download)
+[[headers]]
+  for = "/admin/config.yml"
+  [headers.values]
+    Content-Type = "text/yaml; charset=utf-8"
+    X-Content-Type-Options = "nosniff"
+
+# Make sure admin/index.html is served as HTML
+[[headers]]
+  for = "/admin/index.html"
+  [headers.values]
+    Content-Type = "text/html; charset=utf-8"
+
+# Same for the /admin/ URL (with trailing slash)
+[[headers]]
+  for = "/admin/"
+  [headers.values]
+    Content-Type = "text/html; charset=utf-8"
+
+# ============================================================
+# REDIRECTS — Make sure /admin works without trailing slash
+# ============================================================
+
+[[redirects]]
+  from = "/admin"
+  to = "/admin/"
+  status = 301
+
+# ============================================================
+# CACHING — Prevent caching of the admin so updates appear instantly
+# ============================================================
+
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
