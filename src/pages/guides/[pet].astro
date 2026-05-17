@@ -12,10 +12,47 @@ export async function getStaticPaths() {
 
 const { category } = Astro.props;
 
-const allGuides = await getCollection('guides', ({ data }) => !data.draft);
-const guides = allGuides
+// === Standalone HTML articles (live in public/, not in content collection) ===
+// To add a new standalone article: add an entry under the right category slug.
+const standaloneArticles = {
+  cats: [
+    {
+      url: '/guides/cats/ragdoll-cat-guide/',
+      title: 'Ragdoll Cat Complete Care Guide: Temperament, Health, and the Best Products for 2026',
+      description: 'Everything new and prospective Ragdoll owners need to know — temperament, lifespan, grooming, health concerns, and the products that genuinely serve this gentle, oversized breed.',
+      heroImage: '/uploads/ragdoll-44.jpg',
+      heroImageAlt: 'Adult Ragdoll cat with striking blue eyes and soft white-and-cream semi-long fur',
+      pubDate: new Date('2026-05-16'),
+    },
+    {
+      url: '/guides/cats/nutrition/wet-vs-dry-cat-food/',
+      title: 'Wet vs Dry Cat Food: Which Is Actually Better in 2026?',
+      description: 'The real differences between wet and dry food — hydration, protein quality, carb load, dental impact — and the 8 specific products that deliver in each category across price tiers.',
+      heroImage: '/uploads/ragdoll-208.jpg',
+      heroImageAlt: 'Adult cat resting peacefully in a relaxed pose',
+      pubDate: new Date('2026-05-17'),
+    },
+  ],
+};
+
+// Pull guides from the Astro content collection (Decap CMS articles)
+const allCollectionGuides = await getCollection('guides', ({ data }) => !data.draft);
+const collectionGuidesForCategory = allCollectionGuides
   .filter((g) => g.data.pet === category.slug)
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+  .map((g) => ({
+    url: `/guides/${g.data.pet}/${g.slug}/`,
+    title: g.data.title,
+    description: g.data.description,
+    heroImage: typeof g.data.heroImage === 'string' ? g.data.heroImage : g.data.heroImage.src,
+    heroImageAlt: g.data.heroImageAlt,
+    pubDate: g.data.pubDate,
+  }));
+
+// Merge both sources, sort newest-first
+const guides = [
+  ...collectionGuidesForCategory,
+  ...(standaloneArticles[category.slug] || []),
+].sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf());
 
 const title = `${category.name} Care Guides`;
 const description = `Complete care guides for ${category.name.toLowerCase()} — ${category.description}`;
@@ -46,20 +83,20 @@ const description = `Complete care guides for ${category.name.toLowerCase()} —
       <div class="card-grid">
         {guides.map((post) => (
           <article class="post-card">
-            <a href={`/guides/${post.data.pet}/${post.slug}/`}>
+            <a href={post.url}>
               <div class="post-card-image">
                 <img
-                  src={typeof post.data.heroImage === 'string' ? post.data.heroImage : post.data.heroImage.src}
-                  alt={post.data.heroImageAlt}
+                  src={post.heroImage}
+                  alt={post.heroImageAlt}
                   loading="lazy"
                 />
               </div>
               <div class="post-card-body">
                 <div class="post-card-category">{category.name}</div>
-                <h3 class="post-card-title">{post.data.title}</h3>
-                <p class="post-card-excerpt">{post.data.description}</p>
+                <h3 class="post-card-title">{post.title}</h3>
+                <p class="post-card-excerpt">{post.description}</p>
                 <div class="post-card-meta">
-                  {new Date(post.data.pubDate).toLocaleDateString('en-US', {
+                  {new Date(post.pubDate).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'short',
                     day: 'numeric',
