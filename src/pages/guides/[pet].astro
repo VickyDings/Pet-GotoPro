@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { PET_CATEGORIES } from '../../consts.js';
+import { standaloneArticles } from '../../data/standaloneArticles.js';
 import { getCollection } from 'astro:content';
 
 export async function getStaticPaths() {
@@ -12,30 +13,7 @@ export async function getStaticPaths() {
 
 const { category } = Astro.props;
 
-// === Standalone HTML articles (live in public/, not in content collection) ===
-// To add a new standalone article: add an entry under the right category slug.
-const standaloneArticles = {
-  cats: [
-    {
-      url: '/guides/cats/ragdoll-cat-guide/',
-      title: 'Ragdoll Cat Complete Care Guide: Temperament, Health, and the Best Products for 2026',
-      description: 'Everything new and prospective Ragdoll owners need to know — temperament, lifespan, grooming, health concerns, and the products that genuinely serve this gentle, oversized breed.',
-      heroImage: '/uploads/ragdoll-44.jpg',
-      heroImageAlt: 'Adult Ragdoll cat with striking blue eyes and soft white-and-cream semi-long fur',
-      pubDate: new Date('2026-05-16'),
-    },
-    {
-      url: '/guides/cats/nutrition/wet-vs-dry-cat-food/',
-      title: 'Wet vs Dry Cat Food: Which Is Actually Better in 2026?',
-      description: 'The real differences between wet and dry food — hydration, protein quality, carb load, dental impact — and the 8 specific products that deliver in each category across price tiers.',
-      heroImage: '/uploads/ragdoll-208.jpg',
-      heroImageAlt: 'Adult cat resting peacefully in a relaxed pose',
-      pubDate: new Date('2026-05-17'),
-    },
-  ],
-};
-
-// Pull guides from the Astro content collection (Decap CMS articles)
+// Pull guides from the Astro content collection (Decap CMS articles, if any)
 const allCollectionGuides = await getCollection('guides', ({ data }) => !data.draft);
 const collectionGuidesForCategory = allCollectionGuides
   .filter((g) => g.data.pet === category.slug)
@@ -92,7 +70,12 @@ const description = `Complete care guides for ${category.name.toLowerCase()} —
                 />
               </div>
               <div class="post-card-body">
-                <div class="post-card-category">{category.name}</div>
+                <div
+                  class="post-card-category"
+                  style={`background: ${category.colorTint}; color: ${category.colorText};`}
+                >
+                  {category.name}
+                </div>
                 <h3 class="post-card-title">{post.title}</h3>
                 <p class="post-card-excerpt">{post.description}</p>
                 <div class="post-card-meta">
@@ -110,3 +93,106 @@ const description = `Complete care guides for ${category.name.toLowerCase()} —
     )}
   </section>
 </BaseLayout>
+
+<style>
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 28px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .post-card {
+    background: white;
+    border: 1px solid #E4E9F2;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(20, 30, 50, 0.06);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .post-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(20, 30, 50, 0.10), 0 4px 8px rgba(20, 30, 50, 0.05);
+  }
+
+  .post-card a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    height: 100%;
+  }
+
+  .post-card-image {
+    aspect-ratio: 16 / 10;
+    background: #EEF2F8;
+    overflow: hidden;
+  }
+
+  .post-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease;
+  }
+
+  .post-card:hover .post-card-image img {
+    transform: scale(1.04);
+  }
+
+  .post-card-body {
+    padding: 22px 24px 26px;
+  }
+
+  .post-card-category {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 99px;
+    margin-bottom: 12px;
+  }
+
+  .post-card-title {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 1.25;
+    color: #141A26;
+    margin: 0 0 10px;
+    letter-spacing: -0.01em;
+  }
+
+  .post-card-excerpt {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.55;
+    color: #525C6E;
+    margin: 0 0 14px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .post-card-meta {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 12px;
+    color: #7A8599;
+    letter-spacing: 0.02em;
+  }
+
+  @media (max-width: 640px) {
+    .card-grid {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    .post-card-body {
+      padding: 18px 20px 22px;
+    }
+  }
+</style>
