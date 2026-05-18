@@ -1,13 +1,16 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { PET_CATEGORIES } from '../../consts.js';
+import { standaloneCountForPet } from '../../data/standaloneArticles.js';
 import { getCollection } from 'astro:content';
 
 const allGuides = await getCollection('guides', ({ data }) => !data.draft);
+
+// Combine content collection counts with standalone article counts
 const countByPet = Object.fromEntries(
   PET_CATEGORIES.map((cat) => [
     cat.slug,
-    allGuides.filter((g) => g.data.pet === cat.slug).length,
+    allGuides.filter((g) => g.data.pet === cat.slug).length + standaloneCountForPet(cat.slug),
   ])
 );
 
@@ -15,7 +18,6 @@ const title = 'Pet Care Guides';
 const description =
   'In-depth guides on caring for your pet — from first-week checklists for new puppies to advanced aquarium setup, reptile husbandry, and behavioral training.';
 ---
-
 <BaseLayout title={title} description={description}>
   <section class="category-hero">
     <div class="container">
@@ -26,7 +28,6 @@ const description =
       <p class="hero-lede">{description}</p>
     </div>
   </section>
-
   <section class="container" style="padding: 3rem 1rem 5rem;">
     <div class="category-grid">
       {PET_CATEGORIES.map((cat) => {
