@@ -10,6 +10,7 @@
 
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE, PET_CATEGORIES } from '../consts.js';
+import { allStandaloneArticles } from '../data/standaloneArticles.js';
 import { getCollection } from 'astro:content';
 
 const allReviews = await getCollection('reviews', ({ data }) => !data.draft);
@@ -17,9 +18,25 @@ const recentReviews = allReviews
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
   .slice(0, 6);
 
-const allGuides = await getCollection('guides', ({ data }) => !data.draft);
-const recentGuides = allGuides
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+// Pull guides from the content collection, then merge in standalone HTML articles
+// so the homepage's "Fresh From the Guides" section surfaces ALL recent guides
+// regardless of which authoring path they came from.
+const allCollectionGuides = await getCollection('guides', ({ data }) => !data.draft);
+const normalizedCollectionGuides = allCollectionGuides.map((g) => ({
+  url: `/guides/${g.data.pet}/${g.slug}/`,
+  pet: g.data.pet,
+  title: g.data.title,
+  description: g.data.description,
+  heroImage: typeof g.data.heroImage === 'string' ? g.data.heroImage : g.data.heroImage.src,
+  heroImageAlt: g.data.heroImageAlt,
+  pubDate: g.data.pubDate,
+}));
+
+const recentGuides = [
+  ...normalizedCollectionGuides,
+  ...allStandaloneArticles,
+]
+  .sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf())
   .slice(0, 3);
 ---
 
@@ -169,7 +186,7 @@ const recentGuides = allGuides
   )}
 
   <!-- ============================================================
-       LATEST GUIDES
+       LATEST GUIDES (now merges collection + standalone)
        ============================================================ -->
   {recentGuides.length > 0 && (
     <section class="container" style="padding: 48px 16px;">
@@ -185,23 +202,23 @@ const recentGuides = allGuides
 
       <div class="card-grid">
         {recentGuides.map((post) => {
-          const cat = PET_CATEGORIES.find((c) => c.slug === post.data.pet);
+          const cat = PET_CATEGORIES.find((c) => c.slug === post.pet);
           return (
             <article class="post-card">
-              <a href={`/guides/${post.data.pet}/${post.slug}/`}>
+              <a href={post.url}>
                 <div class="post-card-image">
                   <img
-                    src={typeof post.data.heroImage === 'string' ? post.data.heroImage : post.data.heroImage.src}
-                    alt={post.data.heroImageAlt}
+                    src={post.heroImage}
+                    alt={post.heroImageAlt}
                     loading="lazy"
                   />
                 </div>
                 <div class="post-card-body">
                   <div class="post-card-category" style={`color: ${cat?.colorText || 'var(--brand-primary)'};`}>
-                    {cat?.name || post.data.pet}
+                    {cat?.name || post.pet}
                   </div>
-                  <h3 class="post-card-title">{post.data.title}</h3>
-                  <p class="post-card-excerpt">{post.data.description}</p>
+                  <h3 class="post-card-title">{post.title}</h3>
+                  <p class="post-card-excerpt">{post.description}</p>
                 </div>
               </a>
             </article>
