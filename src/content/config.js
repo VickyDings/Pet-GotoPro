@@ -1,52 +1,63 @@
 // ============================================================
-// CONTENT SCHEMAS — The Quality Inspector
+// CONTENT SCHEMAS — UPDATED FOR RICH ADMIN AUTHORING
 // ============================================================
-// Every time you write a post, it has a "frontmatter" block at
-// the top (the stuff between two --- lines) with metadata like
-// title, description, publish date, author, etc. This file
-// defines what fields each type of post MUST have, what fields
-// are optional, and what type each field should be.
-//
-// Why does this matter? Two reasons:
-// 1. If you accidentally forget the publish date on a post, or
-//    typo the pet category, Astro will refuse to build and will
-//    tell you exactly which file has the problem. This prevents
-//    broken posts from going live.
-// 2. TypeScript autocomplete in your code editor knows exactly
-//    what fields each post has, so you can't misspell field names.
+// The guides schema now supports structured products and FAQs
+// authored through Decap CMS, while remaining backward-compatible
+// with existing guides that only have a title + body.
 // ============================================================
 
 import { defineCollection, z } from 'astro:content';
 
 // ------------------------------------------------------------
-// REVIEWS COLLECTION
+// PRODUCT SUB-SCHEMA (used inside guides)
 // ------------------------------------------------------------
-// Every file inside src/content/reviews/{pet}/ must have these fields
-// in its frontmatter. Reviews are commercial affiliate articles about
-// specific products.
+// Each product card in a guide. Author provides EITHER an
+// affiliateUrl (full SiteStripe URL) OR an asin (10-character
+// Amazon product ID). The template resolves whichever is set.
 // ------------------------------------------------------------
 
-const reviews = defineCollection({
-  type: 'content', // Markdown content (as opposed to data files)
+const productSchema = ({ image }) =>
+  z
+    .object({
+      title: z.string(),
+      badge: z.string().optional(),
+      image: image(),
+      imageAlt: z.string(),
+      description: z.string(),
+      affiliateUrl: z.string().url().optional(),
+      asin: z
+        .string()
+        .regex(/^[A-Z0-9]{10}$/, 'ASIN must be 10 uppercase alphanumeric characters')
+        .optional(),
+      priceNote: z
+        .string()
+        .default('*Price subject to change. International links work via Amazon OneLink.'),
+    })
+    .refine((d) => d.affiliateUrl || d.asin, {
+      message: 'Each product needs either an affiliateUrl OR an asin',
+      path: ['affiliateUrl'],
+    });
+
+// ------------------------------------------------------------
+// FAQ SUB-SCHEMA
+// ------------------------------------------------------------
+
+const faqSchema = z.object({
+  question: z.string(),
+  answer: z.string(),
+});
+
+// ------------------------------------------------------------
+// GUIDES COLLECTION (now with rich structured fields)
+// ------------------------------------------------------------
+
+const guides = defineCollection({
+  type: 'content',
   schema: ({ image }) =>
     z.object({
-      // Required — the article's headline
-      title: z.string().min(10).max(100),
-
-      // Required — the 1-2 sentence summary that appears in listings
-      // and in search engine results. 140-160 characters is ideal.
-      description: z.string().min(80).max(200),
-
-      // Required — the hero image at the top of the article.
-      // Use Astro's image() validator so the image is automatically
-      // optimized during build.
-      heroImage: image(),
-
-      // Required alt text for the hero image (accessibility + SEO)
-      heroImageAlt: z.string(),
-
-      // Required — the pet this review is about. Must match a slug
-      // from PET_CATEGORIES in consts.js.
+      // === Core required ===
+      title: z.string().min(10).max(120),
+      description: z.string().min(60).max(220),
       pet: z.enum([
         'dogs',
         'cats',
@@ -55,44 +66,47 @@ const reviews = defineCollection({
         'aquatics',
         'small-animals',
       ]),
-
-      // Required — when the post was first published
       pubDate: z.coerce.date(),
+      heroImage: image(),
+      heroImageAlt: z.string(),
 
-      // Optional — when the post was last updated. Shown in the
-      // byline as "Updated: [date]" which signals freshness to Google.
+      // === Optional metadata ===
+      guide_type: z
+        .enum([
+          'care-guide',
+          'breed-guide',
+          'nutrition',
+          'behavior',
+          'health',
+          'training',
+          'habitat-setup',
+        ])
+        .default('care-guide'),
       updatedDate: z.coerce.date().optional(),
-
-      // Required — the author's slug (must match a file in
-      // src/content/authors/). Used to link to the author page.
       author: z.string().default('editorial-team'),
-
-      // Optional — the veterinary reviewer for health content
       vetReviewer: z.string().optional(),
-
-      // Optional — marks a post as featured on the homepage
       featured: z.boolean().default(false),
-
-      // Optional — marks a post as a draft (won't appear on the live site)
       draft: z.boolean().default(false),
-
-      // Optional — tags for cross-referencing (e.g., "senior-pet",
-      // "budget", "luxury"). Used to build related-posts lists.
       tags: z.array(z.string()).default([]),
+      readingTime: z.number().int().min(1).max(60).optional(),
 
-      // Optional — for listicle reviews, the number of products covered
-      productCount: z.number().optional(),
+      // === Optional content fields ===
+      heroImageCaption: z.string().optional(),
+      lede: z.string().optional(),
+
+      // === Structured product cards ===
+      products: z.array(productSchema({ image })).default([]),
+
+      // === FAQ section ===
+      faqs: z.array(faqSchema).default([]),
     }),
 });
 
 // ------------------------------------------------------------
-// GUIDES COLLECTION
-// ------------------------------------------------------------
-// Guides are informational articles (how-to, care sheets, explainers).
-// Same schema as reviews except without the productCount field.
+// REVIEWS COLLECTION (unchanged from original)
 // ------------------------------------------------------------
 
-const guides = defineCollection({
+const reviews = defineCollection({
   type: 'content',
   schema: ({ image }) =>
     z.object({
@@ -115,18 +129,12 @@ const guides = defineCollection({
       featured: z.boolean().default(false),
       draft: z.boolean().default(false),
       tags: z.array(z.string()).default([]),
-
-      // Guide-specific — estimated reading time in minutes
-      readingTime: z.number().optional(),
+      productCount: z.number().optional(),
     }),
 });
 
 // ------------------------------------------------------------
-// NEWS COLLECTION
-// ------------------------------------------------------------
-// News posts are time-sensitive announcements — product recalls,
-// industry developments, new product launches. They don't have a
-// specific pet category because they may span multiple.
+// NEWS COLLECTION (unchanged)
 // ------------------------------------------------------------
 
 const news = defineCollection({
@@ -141,8 +149,6 @@ const news = defineCollection({
       author: z.string().default('editorial-team'),
       featured: z.boolean().default(false),
       draft: z.boolean().default(false),
-
-      // News posts can span multiple pets
       pets: z
         .array(
           z.enum([
@@ -155,18 +161,12 @@ const news = defineCollection({
           ])
         )
         .default([]),
-
-      // Urgency level — drives styling of news cards
       urgency: z.enum(['info', 'alert', 'breaking']).default('info'),
     }),
 });
 
 // ------------------------------------------------------------
-// AUTHORS COLLECTION
-// ------------------------------------------------------------
-// Author profiles are the foundation of Google's E-E-A-T signals
-// (Experience, Expertise, Authoritativeness, Trust). Every post
-// links to an author page, and every author page shows credentials.
+// AUTHORS COLLECTION (unchanged)
 // ------------------------------------------------------------
 
 const authors = defineCollection({
@@ -174,26 +174,12 @@ const authors = defineCollection({
   schema: ({ image }) =>
     z.object({
       name: z.string(),
-
-      // Professional role (e.g., "Founder & Editor", "Veterinary Reviewer")
       role: z.string(),
-
-      // Short bio for the author card (appears under articles)
       shortBio: z.string().max(300),
-
-      // Professional photo
       photo: image(),
-
-      // Professional credentials (DVM, CPDT-KA, etc.)
       credentials: z.array(z.string()).default([]),
-
-      // Years of experience in the pet industry
       yearsExperience: z.number().optional(),
-
-      // Specialty areas (e.g., "Feline behavior", "Reptile husbandry")
       specialties: z.array(z.string()).default([]),
-
-      // Links to outside profiles (builds trust signals for Google)
       links: z
         .object({
           email: z.string().optional(),
@@ -204,12 +190,6 @@ const authors = defineCollection({
         .optional(),
     }),
 });
-
-// ------------------------------------------------------------
-// EXPORT ALL COLLECTIONS
-// ------------------------------------------------------------
-// Astro reads this export and uses it to enforce the schemas.
-// ------------------------------------------------------------
 
 export const collections = {
   reviews,
