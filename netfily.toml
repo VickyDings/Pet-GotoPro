@@ -1,14 +1,21 @@
 # ============================================================
 # NETLIFY CONFIGURATION FOR PET-GOTOPRO
 # ============================================================
-# This file tells Netlify how to build the site and how to
-# serve specific files (like the Decap CMS config.yml which
-# needs to be served as text, not a download).
+# Build settings, headers for admin assets, redirects, and
+# functions configuration for the AI SEO endpoint.
 # ============================================================
 
 [build]
   command = "npm run build"
   publish = "dist"
+
+# ============================================================
+# FUNCTIONS — Serverless functions for AI SEO and future features
+# ============================================================
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
 
 # ============================================================
 # HEADERS — Tell browsers how to handle specific files
@@ -34,13 +41,21 @@
     Content-Type = "text/html; charset=utf-8"
 
 # ============================================================
-# REDIRECTS — Make sure /admin works without trailing slash
+# REDIRECTS
 # ============================================================
 
+# Make sure /admin works without trailing slash
 [[redirects]]
   from = "/admin"
   to = "/admin/"
   status = 301
+
+# Clean URL for the SEO helper function
+[[redirects]]
+  from = "/api/seo-suggest"
+  to = "/.netlify/functions/seo-suggest"
+  status = 200
+  force = true
 
 # ============================================================
 # CACHING — Prevent caching of the admin so updates appear instantly
