@@ -1,6 +1,19 @@
 ---
+// ============================================================
+// GUIDE ARTICLE TEMPLATE — Renders content-collection guides
+// ============================================================
+// This template wraps every admin-authored guide in the full
+// Pet-GoToPro design system: Fraunces typography, category-tinted
+// chips, styled product cards with amber CTAs, accordion-free
+// FAQ section, breadcrumbs, related guides.
+//
+// Backward-compatible: guides without products or faqs render
+// as a clean prose article. Guides with structured product/FAQ
+// fields get rich rendering automatically.
+// ============================================================
+
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import { SITE, PET_CATEGORIES, DISCLOSURE } from '../../../consts.js';
+import { SITE, PET_CATEGORIES, amazonLink } from '../../../consts.js';
 import { getCollection, getEntry } from 'astro:content';
 
 export async function getStaticPaths() {
@@ -16,20 +29,22 @@ const { Content } = await post.render();
 
 const category = PET_CATEGORIES.find((c) => c.slug === post.data.pet);
 
+// Try to load author file, fall back gracefully if missing
 let author = null;
 try {
   author = await getEntry('authors', post.data.author);
 } catch (e) {
-  // No author file yet, show generic byline
+  // No author file — show generic byline
 }
 
-// Related guides from same pet
+// Pull related guides (same pet category, not this one), newest first
 const allGuides = await getCollection('guides', ({ data }) => !data.draft);
 const related = allGuides
   .filter((g) => g.data.pet === post.data.pet && g.slug !== post.slug)
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
   .slice(0, 3);
 
+// Date formatter
 const formatDate = (date) =>
   new Date(date).toLocaleDateString('en-US', {
     year: 'numeric',
@@ -37,9 +52,28 @@ const formatDate = (date) =>
     day: 'numeric',
   });
 
+// Hero image source (handles both string paths and image() objects)
 const heroSrc =
-  typeof post.data.heroImage === 'string' ? post.data.heroImage : post.data.heroImage.src;
+  typeof post.data.heroImage === 'string'
+    ? post.data.heroImage
+    : post.data.heroImage.src;
 
+// Resolve each product's URL: prefer affiliateUrl, fall back to ASIN
+function resolveProductUrl(product) {
+  if (product.affiliateUrl) return product.affiliateUrl;
+  if (product.asin) return amazonLink(product.asin);
+  return '#';
+}
+
+// Resolve product image source
+function resolveProductImage(product) {
+  return typeof product.image === 'string' ? product.image : product.image.src;
+}
+
+// Lede falls back to description if not set
+const lede = post.data.lede || post.data.description;
+
+// Article schema for Google
 const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
@@ -61,6 +95,23 @@ const articleSchema = {
     },
   },
 };
+
+// FAQPage schema if FAQs exist (boosts "People Also Ask" eligibility)
+const faqSchema =
+  post.data.faqs && post.data.faqs.length > 0
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: post.data.faqs.map((faq) => ({
+          '@type': 'Question',
+          name: faq.question,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: faq.answer,
+          },
+        })),
+      }
+    : null;
 ---
 
 <BaseLayout
@@ -70,84 +121,157 @@ const articleSchema = {
   articleType="article"
 >
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(articleSchema)} />
+  {faqSchema && <script type="application/ld+json" slot="head" set:html={JSON.stringify(faqSchema)} />}
 
-  <article>
-    <div class="container-narrow" style="padding: 2rem 1rem 0;">
-      <div class="breadcrumbs">
-        <a href="/">Home</a> › <a href="/guides/">Guides</a> ›
-        <a href={`/guides/${post.data.pet}/`}>{category?.name || post.data.pet}</a> ›
-        <span aria-current="page">{post.data.title}</span>
+  <article class="guide-article">
+
+    <!-- ==== HERO SECTION ==== -->
+    <section class="guide-hero">
+      <div class="guide-hero-inner">
+        <div class="breadcrumbs">
+          <a href="/">Home</a> ›
+          <a href="/guides/">Guides</a> ›
+          <a href={`/guides/${post.data.pet}/`}>{category?.name || post.data.pet}</a> ›
+          <span aria-current="page">{post.data.title}</span>
+        </div>
+
+        <div
+          class="category-chip"
+          style={`background: ${category?.colorTint}; color: ${category?.colorText};`}
+        >
+          {category?.icon} {category?.name} {post.data.guide_type === 'breed-guide' ? 'Breed Guide' : 'Guide'}
+        </div>
+
+        <h1 class="article-title">{post.data.title}</h1>
+
+        <p class="article-lede">{lede}</p>
+
+        <div class="article-meta">
+          {author ? (
+            <span>By <a href={`/authors/${author.slug}/`}><strong>{author.data.name}</strong></a></span>
+          ) : (
+            <span>By <strong>Editorial Team</strong></span>
+          )}
+          <span class="dot">·</span>
+          <span>Published <strong>{formatDate(post.data.pubDate)}</strong></span>
+          {post.data.updatedDate && (
+            <>
+              <span class="dot">·</span>
+              <span>Updated <strong>{formatDate(post.data.updatedDate)}</strong></span>
+            </>
+          )}
+          {post.data.readingTime && (
+            <>
+              <span class="dot">·</span>
+              <span><strong>~{post.data.readingTime} min read</strong></span>
+            </>
+          )}
+        </div>
       </div>
+    </section>
 
-      <div style="font-size: 0.85rem; color: var(--primary); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.75rem;">
-        {category?.name} · Guide
-      </div>
-
-      <h1 style="margin-bottom: 1rem;">{post.data.title}</h1>
-
-      <p style="font-family: var(--font-display); font-style: italic; font-size: 1.2rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.5rem;">
-        {post.data.description}
-      </p>
-
-      <div class="article-meta">
-        {author && (
-          <span><strong>By:</strong> <a href={`/authors/${author.slug}/`}>{author.data.name}</a></span>
-        )}
-        {post.data.vetReviewer && (
-          <span><strong>Medically reviewed by:</strong> {post.data.vetReviewer}</span>
-        )}
-        <span><strong>Published:</strong> {formatDate(post.data.pubDate)}</span>
-        {post.data.updatedDate && (
-          <span><strong>Updated:</strong> {formatDate(post.data.updatedDate)}</span>
-        )}
-        {post.data.readingTime && (
-          <span><strong>Reading time:</strong> {post.data.readingTime} min</span>
-        )}
-      </div>
+    <!-- ==== HERO IMAGE ==== -->
+    <div class="hero-image-wrap">
+      <img src={heroSrc} alt={post.data.heroImageAlt} loading="eager" />
+      {post.data.heroImageCaption && (
+        <p class="image-caption">{post.data.heroImageCaption}</p>
+      )}
     </div>
 
-    <div class="container-narrow" style="padding: 1rem;">
-      <img
-        src={heroSrc}
-        alt={post.data.heroImageAlt}
-        style="width: 100%; border-radius: var(--radius-lg);"
-        loading="eager"
-      />
-    </div>
+    <!-- ==== ARTICLE BODY ==== -->
+    <div class="article-body">
 
-    <div class="page-content prose">
-      <Content />
-    </div>
+      <!-- Affiliate disclosure -->
+      <div class="disclosure-box">
+        <strong>Affiliate disclosure:</strong> This article contains affiliate links. As an Amazon Associate I earn from qualifying purchases. If you click through and buy, we may earn a small commission at no additional cost to you. All recommendations are based on independent research and hands-on experience.
+      </div>
 
-    {author && (
-      <div class="container-narrow" style="padding: 2rem 1rem;">
-        <div style="background: var(--bg-alt); border-radius: var(--radius-lg); padding: 2rem; display: flex; gap: 1.5rem; align-items: flex-start; flex-wrap: wrap;">
+      <!-- Main prose (markdown body) -->
+      <div class="prose">
+        <Content />
+      </div>
+
+      <!-- ==== PRODUCT RECOMMENDATIONS ==== -->
+      {post.data.products && post.data.products.length > 0 && (
+        <section class="products-section">
+          <h2 class="section-heading">Our Picks</h2>
+          {post.data.products.map((product) => (
+            <div class="product-card">
+              <div class="product-card-image">
+                <img src={resolveProductImage(product)} alt={product.imageAlt} loading="lazy" />
+              </div>
+              <div class="product-card-body">
+                {product.badge && (
+                  <div
+                    class="product-card-badge"
+                    style={`background: ${category?.colorTint}; color: ${category?.colorText};`}
+                  >
+                    {product.badge}
+                  </div>
+                )}
+                <h3 class="product-card-title">{product.title}</h3>
+                <p class="product-card-description">{product.description}</p>
+                <a
+                  href={resolveProductUrl(product)}
+                  target="_blank"
+                  rel="sponsored noopener"
+                  class="btn-amazon"
+                >
+                  Check Price on Amazon →
+                </a>
+                {product.priceNote && (
+                  <p class="price-note">{product.priceNote}</p>
+                )}
+              </div>
+            </div>
+          ))}
+        </section>
+      )}
+
+      <!-- ==== FAQ SECTION ==== -->
+      {post.data.faqs && post.data.faqs.length > 0 && (
+        <section class="faq-section">
+          <h2 class="section-heading">Frequently Asked Questions</h2>
+          <div class="faq">
+            {post.data.faqs.map((faq) => (
+              <div class="faq-item">
+                <h3 class="faq-question">{faq.question}</h3>
+                <p class="faq-answer">{faq.answer}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <!-- ==== AUTHOR CARD ==== -->
+      {author && (
+        <div class="author-card">
           {author.data.photo && (
             <img
               src={typeof author.data.photo === 'string' ? author.data.photo : author.data.photo.src}
               alt={author.data.name}
-              width="80"
-              height="80"
-              style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;"
+              class="author-photo"
             />
           )}
-          <div style="flex: 1; min-width: 200px;">
-            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.25rem;">Written by</div>
-            <h3 style="margin: 0 0 0.25rem; font-size: 1.25rem;">
-              <a href={`/authors/${author.slug}/`} style="color: var(--ink); text-decoration: none;">{author.data.name}</a>
+          <div class="author-info">
+            <div class="author-eyebrow">Written by</div>
+            <h3 class="author-name">
+              <a href={`/authors/${author.slug}/`}>{author.data.name}</a>
             </h3>
-            <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">{author.data.role}</div>
-            <p style="font-size: 0.95rem; line-height: 1.6; margin: 0;">{author.data.shortBio}</p>
+            <div class="author-role">{author.data.role}</div>
+            <p class="author-bio">{author.data.shortBio}</p>
           </div>
         </div>
-      </div>
-    )}
+      )}
+
+    </div>
   </article>
 
+  <!-- ==== RELATED GUIDES ==== -->
   {related.length > 0 && (
-    <section style="background: var(--bg-alt); padding: 4rem 1rem; margin-top: 4rem;">
-      <div class="container">
-        <h2 style="margin-top: 0; margin-bottom: 2rem;">More {category?.name} Guides</h2>
+    <section class="related-section">
+      <div class="related-inner">
+        <h2>More {category?.name} Guides</h2>
         <div class="card-grid">
           {related.map((r) => (
             <article class="post-card">
@@ -160,7 +284,12 @@ const articleSchema = {
                   />
                 </div>
                 <div class="post-card-body">
-                  <div class="post-card-category">{category?.name}</div>
+                  <div
+                    class="post-card-category"
+                    style={`background: ${category?.colorTint}; color: ${category?.colorText};`}
+                  >
+                    {category?.name}
+                  </div>
                   <h3 class="post-card-title">{r.data.title}</h3>
                   <p class="post-card-excerpt">{r.data.description}</p>
                 </div>
@@ -172,3 +301,422 @@ const articleSchema = {
     </section>
   )}
 </BaseLayout>
+
+<style>
+  /* ============================================================
+     GUIDE ARTICLE STYLES
+     ============================================================ */
+
+  .guide-article {
+    background: linear-gradient(180deg, #F7F9FC, white);
+  }
+
+  /* === HERO === */
+  .guide-hero {
+    padding: 48px 20px 32px;
+  }
+  .guide-hero-inner {
+    max-width: 920px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .breadcrumbs {
+    font-size: 13px;
+    color: #7A8599;
+    margin-bottom: 18px;
+    letter-spacing: 0.04em;
+  }
+  .breadcrumbs a {
+    color: #525C6E;
+    text-decoration: none;
+  }
+  .breadcrumbs a:hover { color: #1F2A44; }
+  .category-chip {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .article-title {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 600;
+    font-size: clamp(1.875rem, 5vw + 0.5rem, 3rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: #141A26;
+    margin: 0 0 18px;
+  }
+  .article-title em {
+    font-style: italic;
+    font-weight: 500;
+    color: #1F2A44;
+  }
+  .article-lede {
+    font-family: 'Fraunces', Georgia, serif;
+    font-style: italic;
+    font-size: 18px;
+    color: #525C6E;
+    max-width: 680px;
+    margin: 0 auto 24px;
+    line-height: 1.55;
+  }
+  .article-meta {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 18px 0;
+    border-top: 1px solid #E4E9F2;
+    border-bottom: 1px solid #E4E9F2;
+    margin: 0 auto;
+    max-width: 720px;
+    font-size: 13px;
+    color: #7A8599;
+  }
+  .article-meta strong { color: #141A26; }
+  .article-meta a { color: inherit; text-decoration: none; }
+  .article-meta a:hover { color: #1F2A44; }
+  .article-meta .dot { color: #C2CADB; }
+
+  /* === HERO IMAGE === */
+  .hero-image-wrap {
+    max-width: 1100px;
+    margin: 0 auto 32px;
+    padding: 0 20px;
+  }
+  .hero-image-wrap img {
+    width: 100%;
+    border-radius: 16px;
+    box-shadow: 0 12px 28px rgba(20,30,50,0.10), 0 4px 8px rgba(20,30,50,0.05);
+    display: block;
+  }
+  .image-caption {
+    font-size: 12px;
+    color: #7A8599;
+    font-style: italic;
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  /* === ARTICLE BODY === */
+  .article-body {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 20px 48px;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 17px;
+    line-height: 1.65;
+    color: #2A3242;
+  }
+
+  /* === DISCLOSURE === */
+  .disclosure-box {
+    background: #FDFAF3;
+    border-left: 3px solid #E25C2D;
+    padding: 18px 22px;
+    border-radius: 0 10px 10px 0;
+    margin: 28px 0;
+    font-size: 15px;
+    color: #525C6E;
+  }
+  .disclosure-box strong { color: #141A26; }
+
+  /* === PROSE === */
+  .prose :global(p) { margin: 0 0 22px; }
+  .prose :global(h2) {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 600;
+    font-size: clamp(1.5rem, 3vw + 0.5rem, 2rem);
+    margin: 48px 0 18px;
+    color: #141A26;
+    letter-spacing: -0.015em;
+    line-height: 1.2;
+  }
+  .prose :global(h3) {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 600;
+    font-size: clamp(1.25rem, 2vw + 0.5rem, 1.5rem);
+    margin: 36px 0 14px;
+    color: #141A26;
+    letter-spacing: -0.01em;
+  }
+  .prose :global(strong) { color: #141A26; }
+  .prose :global(ul), .prose :global(ol) {
+    margin: 0 0 22px;
+    padding-left: 22px;
+  }
+  .prose :global(li) {
+    margin-bottom: 8px;
+  }
+  .prose :global(a) {
+    color: #1F2A44;
+    font-weight: 600;
+  }
+  .prose :global(img) {
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(20,30,50,0.08);
+    margin: 32px 0;
+    width: 100%;
+  }
+  .prose :global(blockquote) {
+    border-left: 3px solid #1F2A44;
+    padding: 4px 0 4px 20px;
+    margin: 28px 0;
+    font-family: 'Fraunces', Georgia, serif;
+    font-style: italic;
+    font-size: 18px;
+    color: #525C6E;
+  }
+
+  /* === SECTION HEADINGS === */
+  .section-heading {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 600;
+    font-size: clamp(1.5rem, 3vw + 0.5rem, 2rem);
+    margin: 48px 0 24px;
+    color: #141A26;
+    letter-spacing: -0.015em;
+  }
+
+  /* === PRODUCT CARDS === */
+  .products-section { margin: 48px 0; }
+  .product-card {
+    background: white;
+    border: 1px solid #E4E9F2;
+    border-radius: 16px;
+    overflow: hidden;
+    margin: 32px 0;
+    box-shadow: 0 1px 3px rgba(20,30,50,0.06);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .product-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(20,30,50,0.08), 0 2px 4px rgba(20,30,50,0.04);
+  }
+  .product-card-image {
+    background: #EEF2F8;
+    padding: 28px;
+    text-align: center;
+  }
+  .product-card-image img {
+    max-width: 340px;
+    margin: 0 auto;
+    max-height: 280px;
+    width: auto;
+    object-fit: contain;
+  }
+  .product-card-body {
+    padding: 24px 28px 28px;
+  }
+  .product-card-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 99px;
+    margin-bottom: 12px;
+  }
+  .product-card-title {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 600;
+    font-size: 22px;
+    color: #141A26;
+    margin: 0 0 12px;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+  }
+  .product-card-description {
+    font-size: 15px;
+    color: #525C6E;
+    line-height: 1.6;
+    margin: 0 0 18px;
+  }
+  .btn-amazon {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #E25C2D;
+    color: white;
+    padding: 14px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 15px;
+    text-decoration: none;
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
+  }
+  .btn-amazon:hover {
+    background: #C84B22;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(20,30,50,0.08);
+  }
+  .price-note {
+    font-size: 12px;
+    color: #7A8599;
+    font-style: italic;
+    margin-top: 12px;
+  }
+
+  /* === FAQ === */
+  .faq-section { margin: 48px 0; }
+  .faq-item {
+    margin-bottom: 22px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid #E4E9F2;
+  }
+  .faq-item:last-child { border-bottom: none; }
+  .faq-question {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 600;
+    font-size: 18px;
+    color: #141A26;
+    margin: 0 0 10px;
+    letter-spacing: -0.01em;
+  }
+  .faq-answer {
+    font-size: 16px;
+    color: #525C6E;
+    line-height: 1.65;
+    margin: 0;
+  }
+
+  /* === AUTHOR CARD === */
+  .author-card {
+    background: #EEF2F8;
+    border-radius: 16px;
+    padding: 28px;
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    margin: 48px 0;
+  }
+  .author-photo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+  .author-info { flex: 1; min-width: 200px; }
+  .author-eyebrow {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #7A8599;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .author-name {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 1.25rem;
+    margin: 0 0 4px;
+  }
+  .author-name a { color: #141A26; text-decoration: none; }
+  .author-role {
+    font-size: 0.9rem;
+    color: #7A8599;
+    margin-bottom: 8px;
+  }
+  .author-bio {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* === RELATED === */
+  .related-section {
+    background: #EEF2F8;
+    padding: 56px 20px;
+    margin-top: 48px;
+  }
+  .related-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .related-inner h2 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 600;
+    margin: 0 0 28px;
+    color: #141A26;
+    letter-spacing: -0.015em;
+  }
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+  }
+  .post-card {
+    background: white;
+    border: 1px solid #E4E9F2;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(20,30,50,0.06);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .post-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(20,30,50,0.10), 0 4px 8px rgba(20,30,50,0.05);
+  }
+  .post-card a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+  .post-card-image {
+    aspect-ratio: 16 / 10;
+    background: #EEF2F8;
+    overflow: hidden;
+  }
+  .post-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .post-card-body { padding: 20px 22px 22px; }
+  .post-card-category {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 99px;
+    margin-bottom: 10px;
+  }
+  .post-card-title {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 1.25;
+    color: #141A26;
+    margin: 0 0 8px;
+  }
+  .post-card-excerpt {
+    font-size: 13px;
+    color: #525C6E;
+    margin: 0;
+    line-height: 1.55;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 640px) {
+    .guide-hero { padding: 32px 16px 24px; }
+    .hero-image-wrap { padding: 0 16px; }
+    .article-body { padding: 0 16px 32px; }
+    .product-card-image { padding: 20px; }
+    .product-card-body { padding: 20px; }
+    .author-card { padding: 20px; }
+    .related-section { padding: 40px 16px; }
+  }
+</style>
