@@ -1,9 +1,13 @@
 # ============================================================
-# DECAP CMS CONFIGURATION FOR PET-GOTOPRO
+# DECAP CMS CONFIGURATION FOR PET-GOTOPRO — REDESIGNED
 # ============================================================
-# This file tells the content manager what kinds of content
-# exist on the site and what fields they need. Edit this file
-# when you want to add new content types or fields.
+# Consolidates the previous four guide collections into one
+# unified `guides` collection with rich structured fields:
+# products (with image, link, description), FAQs, hero image,
+# and a flexible markdown body for prose.
+#
+# To author a new guide: log into /admin → click "Pet Care Guide"
+# → "New Pet Care Guide" → fill in fields → Publish.
 # ============================================================
 
 backend:
@@ -13,64 +17,189 @@ backend:
 media_folder: "public/uploads"
 public_folder: "/uploads"
 
-# Site URL for previews
 site_url: https://pet-gotopro.com
 display_url: https://pet-gotopro.com
 logo_url: https://pet-gotopro.com/pet-gotopro-logo.png
 
-# ============================================================
-# COLLECTIONS — Each collection is a content type
-# ============================================================
-
 collections:
 
   # ----------------------------------------------------------
-  # BREED GUIDES (cats & dogs)
+  # PET CARE GUIDES (unified collection — all pets, all types)
   # ----------------------------------------------------------
-  - name: "cat-breed-guides"
-    label: "🐈 Cat Breed Guides"
-    label_singular: "Cat Breed Guide"
-    folder: "src/content/guides/cats/breeds"
+  - name: "guides"
+    label: "📖 Pet Care Guides"
+    label_singular: "Pet Care Guide"
+    folder: "src/content/guides"
     create: true
     slug: "{{slug}}"
-    media_folder: "images"
-    public_folder: "./images"
-    preview_path: "guides/cats/{{slug}}"
+    preview_path: "guides/{{pet}}/{{slug}}"
+    summary: "{{title}} ({{pet}})"
+    sortable_fields: ['pubDate', 'title', 'pet']
     fields:
-      - {label: "Title", name: "title", widget: "string", hint: "Article headline — appears at top of page and in Google search results"}
-      - {label: "SEO Description", name: "description", widget: "text", hint: "Short summary that appears in Google search results (aim for 150-160 characters)"}
-      - {label: "Pet Category", name: "pet", widget: "hidden", default: "cats"}
-      - {label: "Publish Date", name: "pubDate", widget: "datetime"}
-      - {label: "Author", name: "author", widget: "string", default: "editorial-team"}
-      - {label: "Featured on Homepage", name: "featured", widget: "boolean", default: false}
-      - {label: "Hero Image", name: "heroImage", widget: "image", hint: "The big image at the top of the article"}
-      - {label: "Hero Image Alt Text", name: "heroImageAlt", widget: "string", hint: "Brief description of the image for accessibility/SEO"}
-      - {label: "Tags", name: "tags", widget: "list", default: ["breed-guide", "cats"]}
-      - {label: "Article Body", name: "body", widget: "markdown", hint: "Write your article here. Drag images directly into the editor."}
 
-  - name: "dog-breed-guides"
-    label: "🐕 Dog Breed Guides"
-    label_singular: "Dog Breed Guide"
-    folder: "src/content/guides/dogs/breeds"
-    create: true
-    slug: "{{slug}}"
-    media_folder: "images"
-    public_folder: "./images"
-    preview_path: "guides/dogs/{{slug}}"
-    fields:
-      - {label: "Title", name: "title", widget: "string"}
-      - {label: "SEO Description", name: "description", widget: "text"}
-      - {label: "Pet Category", name: "pet", widget: "hidden", default: "dogs"}
-      - {label: "Publish Date", name: "pubDate", widget: "datetime"}
-      - {label: "Author", name: "author", widget: "string", default: "editorial-team"}
-      - {label: "Featured on Homepage", name: "featured", widget: "boolean", default: false}
-      - {label: "Hero Image", name: "heroImage", widget: "image"}
-      - {label: "Hero Image Alt Text", name: "heroImageAlt", widget: "string"}
-      - {label: "Tags", name: "tags", widget: "list", default: ["breed-guide", "dogs"]}
-      - {label: "Article Body", name: "body", widget: "markdown"}
+      # === BASIC INFO ===
+      - label: "Title"
+        name: "title"
+        widget: "string"
+        hint: "Article headline. Appears at top of page and in Google search results. 50-70 characters ideal."
+
+      - label: "SEO Description"
+        name: "description"
+        widget: "text"
+        hint: "150-200 character summary for Google search results. Use the SEO Helper at /admin/seo-helper/ for AI suggestions."
+
+      - label: "Pet Category"
+        name: "pet"
+        widget: "select"
+        options: ["dogs", "cats", "birds", "reptiles", "aquatics", "small-animals"]
+        hint: "Drives URL structure and category page placement."
+
+      - label: "Guide Type"
+        name: "guide_type"
+        widget: "select"
+        options: ["care-guide", "breed-guide", "nutrition", "behavior", "health", "training", "habitat-setup"]
+        default: "care-guide"
+        hint: "Used for organizing related guides. Doesn't affect URL."
+
+      - label: "Publish Date"
+        name: "pubDate"
+        widget: "datetime"
+
+      - label: "Last Updated Date"
+        name: "updatedDate"
+        widget: "datetime"
+        required: false
+        hint: "Set this when you significantly revise the article. Shown as 'Updated:' in the byline — signals freshness to Google."
+
+      - label: "Author"
+        name: "author"
+        widget: "string"
+        default: "editorial-team"
+
+      - label: "Featured on Homepage"
+        name: "featured"
+        widget: "boolean"
+        default: false
+
+      - label: "Draft (won't publish to live site)"
+        name: "draft"
+        widget: "boolean"
+        default: false
+
+      # === HERO IMAGE ===
+      - label: "Hero Image"
+        name: "heroImage"
+        widget: "image"
+        hint: "Large image at top of article. Recommended 1200×675 (16:9). Upload via 'Choose an image' or paste a path like /uploads/your-image.jpg"
+
+      - label: "Hero Image Alt Text"
+        name: "heroImageAlt"
+        widget: "string"
+        hint: "Describes the image for screen readers and Google image search."
+
+      - label: "Hero Image Caption (credit/source)"
+        name: "heroImageCaption"
+        widget: "string"
+        required: false
+        hint: "Optional. Shown under the hero image — e.g., 'Image: Oxford-IIIT Pet Dataset, licensed CC BY-SA 4.0'"
+
+      # === LEDE ===
+      - label: "Article Lede"
+        name: "lede"
+        widget: "text"
+        required: false
+        hint: "Optional 1-2 sentence italic subtitle shown directly under the title. If empty, the SEO description is used."
+
+      - label: "Reading Time (minutes)"
+        name: "readingTime"
+        widget: "number"
+        required: false
+        value_type: "int"
+        min: 1
+        max: 60
+        hint: "Optional. Rough estimate: ~250 words per minute."
+
+      # === TAGS ===
+      - label: "Tags"
+        name: "tags"
+        widget: "list"
+        default: []
+        hint: "Optional keyword tags for cross-linking. Examples: senior-cats, hydration, budget."
+
+      # === PRODUCTS LIST ===
+      - label: "Product Recommendations"
+        name: "products"
+        widget: "list"
+        required: false
+        summary: "{{fields.title}}"
+        collapsed: true
+        hint: "Each product becomes a styled product card in the article. Order matters — they render top-to-bottom."
+        fields:
+          - label: "Product Title"
+            name: "title"
+            widget: "string"
+            hint: "Full product name as it should appear on the card."
+
+          - label: "Badge (optional)"
+            name: "badge"
+            widget: "string"
+            required: false
+            hint: "Optional pill badge above the title. Examples: '🏆 Top Pick', '💰 Best Budget', '🩺 Vet Recommended'."
+
+          - label: "Product Image"
+            name: "image"
+            widget: "image"
+            hint: "Product photo on clean background. 340-500px wide works well."
+
+          - label: "Product Image Alt Text"
+            name: "imageAlt"
+            widget: "string"
+
+          - label: "Description"
+            name: "description"
+            widget: "text"
+            hint: "2-4 sentences explaining why you're recommending this product. Be specific."
+
+          - label: "Affiliate URL (Option A — preferred)"
+            name: "affiliateUrl"
+            widget: "string"
+            required: false
+            hint: "Paste full URL from Amazon SiteStripe (e.g., https://amzn.to/abc123). Use EITHER this OR the ASIN field below."
+
+          - label: "ASIN (Option B — fallback)"
+            name: "asin"
+            widget: "string"
+            required: false
+            pattern: ['^[A-Z0-9]{10}$', 'Must be a 10-character Amazon ASIN like B0CNCHGMCX']
+            hint: "10-character Amazon product ID. Site will auto-build the affiliate link with your bizco057-20 tag."
+
+          - label: "Price Note"
+            name: "priceNote"
+            widget: "string"
+            required: false
+            default: "*Price subject to change. International links work via Amazon OneLink."
+            hint: "Shown under the Amazon button as a small italic disclaimer."
+
+      # === FAQ LIST ===
+      - label: "Frequently Asked Questions"
+        name: "faqs"
+        widget: "list"
+        required: false
+        summary: "{{fields.question}}"
+        collapsed: true
+        hint: "Optional FAQ section. Great for capturing Google's 'People Also Ask' boxes — phrase questions like real search queries."
+        fields:
+          - {label: "Question", name: "question", widget: "string"}
+          - {label: "Answer", name: "answer", widget: "text"}
+
+      # === ARTICLE BODY ===
+      - label: "Article Body"
+        name: "body"
+        widget: "markdown"
+        hint: "Main prose of the article. Write naturally with H2/H3 headings. Products and FAQs are rendered separately (above) — don't repeat them here."
 
   # ----------------------------------------------------------
-  # PRODUCT REVIEWS
+  # PRODUCT REVIEWS (unchanged from previous config)
   # ----------------------------------------------------------
   - name: "reviews"
     label: "⭐ Product Reviews"
@@ -78,8 +207,6 @@ collections:
     folder: "src/content/reviews"
     create: true
     slug: "{{slug}}"
-    media_folder: "images"
-    public_folder: "./images"
     preview_path: "reviews/{{pet}}/{{slug}}"
     fields:
       - {label: "Title", name: "title", widget: "string"}
@@ -94,31 +221,7 @@ collections:
       - {label: "Article Body", name: "body", widget: "markdown"}
 
   # ----------------------------------------------------------
-  # CARE GUIDES (general, not breed-specific)
-  # ----------------------------------------------------------
-  - name: "guides"
-    label: "📖 Care Guides"
-    label_singular: "Care Guide"
-    folder: "src/content/guides"
-    create: true
-    slug: "{{slug}}"
-    media_folder: "images"
-    public_folder: "./images"
-    preview_path: "guides/{{pet}}/{{slug}}"
-    fields:
-      - {label: "Title", name: "title", widget: "string"}
-      - {label: "SEO Description", name: "description", widget: "text"}
-      - {label: "Pet Category", name: "pet", widget: "select", options: ["dogs", "cats", "birds", "reptiles", "aquatics", "small-animals"]}
-      - {label: "Publish Date", name: "pubDate", widget: "datetime"}
-      - {label: "Author", name: "author", widget: "string", default: "editorial-team"}
-      - {label: "Featured on Homepage", name: "featured", widget: "boolean", default: false}
-      - {label: "Hero Image", name: "heroImage", widget: "image"}
-      - {label: "Hero Image Alt Text", name: "heroImageAlt", widget: "string"}
-      - {label: "Tags", name: "tags", widget: "list"}
-      - {label: "Article Body", name: "body", widget: "markdown"}
-
-  # ----------------------------------------------------------
-  # NEWS POSTS
+  # NEWS POSTS (unchanged)
   # ----------------------------------------------------------
   - name: "news"
     label: "📰 News & Recalls"
@@ -126,8 +229,6 @@ collections:
     folder: "src/content/news"
     create: true
     slug: "{{slug}}"
-    media_folder: "images"
-    public_folder: "./images"
     preview_path: "news/{{slug}}"
     fields:
       - {label: "Title", name: "title", widget: "string"}
