@@ -6,7 +6,7 @@ guide_type: "habitat-setup"
 pubDate: 2026-09-04
 author: "editorial-team"
 featured: false
-draft: true
+draft: false
 heroImage: "../../assets/guides/reptiles/young-bearded-dragon-being-held-by-owner.jpg"
 heroImageAlt: "Young bearded dragon resting calmly on its owner's hand"
 lede: "Bearded dragons are the friendliest lizard you can keep, and the one most often kept wrong. Nearly every sick beardie traces back to three things — weak UVB, a basking spot too cool to digest food, and an adult still being fed like a baby."
